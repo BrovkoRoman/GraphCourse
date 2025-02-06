@@ -1,0 +1,17 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: create
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    username: postgres
+    password: 123
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/graphs
+
+jwt:
+  secret: pokW()4309gj4g04J$G($J()$G$GGrogej34oigj894g
