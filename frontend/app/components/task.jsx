@@ -152,8 +152,8 @@ export class Task extends React.Component {
                             );
                         })
                     }
-                </div>
-               );
+                    </div>
+            );
         }
 
         return (<div>

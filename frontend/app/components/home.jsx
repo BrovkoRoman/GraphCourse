@@ -1,6 +1,7 @@
 import React from 'react'
 import {getCookieValue} from "../utils/getCookie.js"
 import {Task} from "./task.jsx"
+import {Test} from "./test.jsx"
 import {toBase64} from "../utils/toBase64.js"
 
 function makeTeacher() {
@@ -27,6 +28,8 @@ export class Home extends React.Component {
             sections: [],
             tasks: [],
             taskScores: [],
+            tests: [],
+            testScores: [],
             role: getCookieValue("role")
         };
     }
@@ -97,7 +100,7 @@ export class Home extends React.Component {
         console.log("addTask");
         const addTaskInput = document.getElementById("addTask_" + sectionId);
         const addTaskNameInput = document.getElementById("addTaskName_" + sectionId);
-        const maxScoreInput = document.getElementById("maxScore_" + sectionId);
+        const maxScoreInput = document.getElementById("taskMaxScore_" + sectionId);
         const addedTask = {
             sectionId: sectionId,
             name: addTaskNameInput.value,
@@ -124,6 +127,35 @@ export class Home extends React.Component {
         })
     }
 
+    addTest(sectionId) {
+        console.log("addTest");
+        const addTestNameInput = document.getElementById("addTest_" + sectionId);
+        const maxScoreInput = document.getElementById("testMaxScore_" + sectionId);
+        const addedTest = {
+            sectionId: sectionId,
+            name: addTestNameInput.value,
+            maxScore: maxScoreInput.value
+        };
+        fetch("http://localhost:8080/new-test",
+        {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            method: "POST",
+            credentials: 'include',
+            body: JSON.stringify(addedTest)
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log(result);
+            this.setState((state) => {
+                addedTest.id = result;
+                state.tests.push(addedTest);
+                return state;
+            });
+        })
+    }
+
   createAddButtons(sectionId) {
     if(this.state.role === "TEACHER") {
         return (
@@ -132,16 +164,30 @@ export class Home extends React.Component {
                 <input type="file" id={"addLecture_" + sectionId} /><br/>
                 <button onClick={() => this.addLecture(sectionId)}>Submit</button><br/>
 
-                <label htmlFor={"addTask_" + sectionId}>Add new task:</label>
+                <label htmlFor={"addTaskName_" + sectionId}>Add new task:</label>
                 <input id={"addTaskName_" + sectionId} placeholder="task name" />
                 <input id={"addTask_" + sectionId} placeholder="task text" />
-                <input id={"maxScore_" + sectionId} placeholder="max score" /><br/>
-                <button onClick={() => this.addTask(sectionId)}>Submit</button>
+                <input id={"taskMaxScore_" + sectionId} placeholder="max score" /><br/>
+                <button onClick={() => this.addTask(sectionId)}>Submit</button><br/>
+
+                <label htmlFor={"addTest_" + sectionId}>Add new test:</label>
+                <input id={"addTest_" + sectionId} placeholder="test name" />
+                <input id={"testMaxScore_" + sectionId} placeholder="max score" />
+                <button onClick={() => this.addTest(sectionId)}>Submit</button>
             </div>
         )
     }
 
     return null;
+  }
+
+  buildTestScore(testId, maxScore) {
+    const testScoreObject = this.state.testScores.find(obj => (obj.testId === testId));
+    if(!!testScoreObject) {
+        return (<span> {testScoreObject.score.toFixed(2)}/{maxScore.toFixed(2)}</span>);
+    } else {
+        return null;
+    }
   }
 
   render() {
@@ -159,22 +205,32 @@ export class Home extends React.Component {
                             <br />
                         </div>
                     ))}
-                    {this.state.tasks.filter(task => (task.sectionId == section.id))
-                    .map(task => {
-                        while(taskScoresIndex < this.state.taskScores.length &&
-                            this.state.taskScores[taskScoresIndex].taskId < task.id) {
-                            taskScoresIndex++;
-                        }
-                        return (
-                            <div>
-                                <a onClick = {() => this.props.onClickTask(task)}>{task.name}</a>
-                                {taskScoresIndex < this.state.taskScores.length &&
-                                 this.state.taskScores[taskScoresIndex].taskId === task.id ?
-                                       (<span> {this.state.taskScores[taskScoresIndex].score}/{task.maxScore}</span>) : null}
-                            </div>
-                        );
+                    {this.state.tests.filter(test => (test.sectionId == section.id))
+                        .map(test => (
+                                <div>
+                                    <a onClick = {() => this.props.onClickTest(test)}>{test.name}
+                                    {test.published ? null : (<span> (не опубликовано)</span>)}
+                                    {this.buildTestScore(test.id, test.maxScore)}</a>
+                                </div>
+                            ))
                     }
-                    )}
+                    {this.state.tasks.filter(task => (task.sectionId == section.id))
+                        .map(task => {
+                            while(taskScoresIndex < this.state.taskScores.length &&
+                                this.state.taskScores[taskScoresIndex].taskId < task.id) {
+                                taskScoresIndex++;
+                            }
+                            return (
+                                <div>
+                                    <a onClick = {() => this.props.onClickTask(task)}>{task.name}</a>
+                                    {taskScoresIndex < this.state.taskScores.length &&
+                                     this.state.taskScores[taskScoresIndex].taskId === task.id ?
+                                           (<span> {this.state.taskScores[taskScoresIndex].score}/{task.maxScore}</span>)
+                                           : null}
+                                </div>
+                            );
+                        })
+                    }
                     {this.createAddButtons(section.id)}
                 </div>
             </div>
@@ -203,26 +259,38 @@ export class Home extends React.Component {
   componentDidMount() {
     if(!!this.state.role && this.state.role === "STUDENT") {
         fetch("http://localhost:8080/task-scores",
-            {
-                method: "GET",
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(result => {
-                if(!!result) {
-                    result.sort((a, b) => a.taskId > b.taskId ? 1 : -1);
-                    this.setState({
-                        taskScores: result
-                    })
-                }
-                console.log("task scores:");
+        {
+            method: "GET",
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(!!result) {
+                result.sort((a, b) => a.taskId > b.taskId ? 1 : -1);
+                this.setState({
+                    taskScores: result
+                })
+            }
+            console.log("task scores:");
 
-                for(let x of result) {
-                    console.log(x);
-                }
-            });
+            for(let x of result) {
+                console.log(x);
+            }
+        });
+
+        fetch("http://localhost:8080/get-test-scores",
+        {
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(!!result) {
+                this.setState({
+                    testScores: result
+                })
+            }
+        });
     }
-
 
     if(!!this.state.role && this.state.role !== "TEACHER") {
         fetch("http://localhost:8080/check-role",
@@ -251,11 +319,35 @@ export class Home extends React.Component {
                   fetch("http://localhost:8080/all-tasks")
                     .then(response => response.json())
                     .then(tasksArray => {
-                      this.setState({
-                        lectures: lecturesArray,
-                        sections: sectionsArray,
-                        tasks: tasksArray,
-                      });
+                        if(getCookieValue("role") === "TEACHER") {
+                            fetch("http://localhost:8080/all-tests", {
+                                credentials : 'include'
+                            })
+                            .then(response => response.json())
+                            .then(testsArray => {
+                                if(!!testsArray) {
+                                    this.setState({
+                                        lectures: lecturesArray,
+                                        sections: sectionsArray,
+                                        tasks: tasksArray,
+                                        tests: testsArray
+                                    });
+                                }
+                            });
+                        } else if(getCookieValue("role") === "STUDENT") {
+                            fetch("http://localhost:8080/all-published-tests")
+                            .then(response => response.json())
+                            .then(testsArray => {
+                                if(!!testsArray) {
+                                    this.setState({
+                                        lectures: lecturesArray,
+                                        sections: sectionsArray,
+                                        tasks: tasksArray,
+                                        tests: testsArray
+                                    });
+                                }
+                            });
+                        }
                     });
               });
       });
