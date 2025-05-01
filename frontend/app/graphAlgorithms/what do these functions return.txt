@@ -1,0 +1,16 @@
+Functions in this directory run some graph algorithm for a fixed graph
+and return the sequence of operations that should be performed in the visualization
+to demonstrate work of this algorithm.
+
+Possible operations:
+
+mark v - makes border of vertex v blue. If there is another marked vertex, it becomes unmarked.
+unmark - if there is a marked vertex, make it unmarked.
+visit v - makes vertex grey.
+unvisit v - makes vertex white.
+setInfo v info - assigning a value info to additionalInfo parameter of vertex v. It will be displayed above the vertex.
+edge u v color - colors the edge u->v.
+delay - makes delay before the next operation.
+clear - paints all vertices and edges in default colors. Removes additionalInfo from all vertices.
+
+In these operations v and u are vertex names.

@@ -129,7 +129,7 @@ public class TestController {
                 return false;
             }
 
-            int newCount = countAnswersForQuestion.getOrDefault(questionId, 0) + 1;
+            int newCount = countAnswersForQuestion.getOrDefault(questionId, 0) + 1; // increment answers count
 
             if((questionType == 1 || questionType == 2) && newCount >= 2) { // many answers
                                                                             // for non-multiple-answer question
@@ -232,6 +232,10 @@ public class TestController {
         // (true_positive + true_negative) / all_possible_answers * questionScore
 
         for(TestQuestionEntity question : questions) {
+            if(question.getType() != 3) {
+                break;
+            }
+
             Long questionId = question.getId();
 
             int truePositive = correctAnswersChosenToQuestionCount.getOrDefault(questionId, 0);

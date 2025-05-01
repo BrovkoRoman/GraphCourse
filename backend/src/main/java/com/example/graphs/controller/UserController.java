@@ -75,14 +75,14 @@ public class UserController {
 
                 if(user.getRole().equals("TEACHER")) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return "This user is already teacher";
+                    return "Пользователь уже является преподавателем";
                 } else {
                     userRepository.updateRole(user.getId(), "TEACHER");
-                    return "ok";
+                    return "Пользователю предоставлены права преподавателя";
                 }
             } catch (UsernameNotFoundException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return "User doesn't exist";
+                return "Нет такого пользователя";
             }
         }
     }

@@ -6,6 +6,10 @@ import {toBase64} from "../utils/toBase64.js"
 
 function makeTeacher() {
     const makeTeacherInput = document.getElementById("makeTeacher");
+    if(makeTeacherInput.value === "") {
+        alert("Поле должно быть непустым");
+        return;
+    }
     fetch("http://localhost:8080/make-teacher",
     {
         headers: {
@@ -16,7 +20,9 @@ function makeTeacher() {
         body: makeTeacherInput.value
     })
     .then(response => response.text())
-    .then(result => console.log(result))
+    .then(result => {
+        alert(result);
+    })
 }
 
 export class Home extends React.Component {
@@ -36,6 +42,10 @@ export class Home extends React.Component {
 
     addSection() {
         const addSectionInput = document.getElementById("addSection");
+        if(addSectionInput.value === "") {
+            alert("Поле должно быть непустым");
+            return;
+        }
         const addedSection = {
             name: addSectionInput.value
         };
@@ -98,14 +108,23 @@ export class Home extends React.Component {
 
     addTask(sectionId) {
         console.log("addTask");
-        const addTaskInput = document.getElementById("addTask_" + sectionId);
         const addTaskNameInput = document.getElementById("addTaskName_" + sectionId);
+        const addTaskInput = document.getElementById("addTask_" + sectionId);
         const maxScoreInput = document.getElementById("taskMaxScore_" + sectionId);
+        if(addTaskInput.value === "" || addTaskNameInput.value === "" || maxScoreInput.value === "") {
+            alert("Поля должны быть непустыми");
+            return;
+        }
+        const maxScore = Number(maxScoreInput.value);
+        if(isNaN(maxScore) || maxScore <= 0 || !Number.isInteger(maxScore)) {
+            alert("Максимальный балл должен быть натуральным числом");
+            return;
+        }
         const addedTask = {
             sectionId: sectionId,
             name: addTaskNameInput.value,
             text: addTaskInput.value,
-            maxScore: maxScoreInput.value
+            maxScore: maxScore
         };
         fetch("http://localhost:8080/new-task",
         {
@@ -131,10 +150,19 @@ export class Home extends React.Component {
         console.log("addTest");
         const addTestNameInput = document.getElementById("addTest_" + sectionId);
         const maxScoreInput = document.getElementById("testMaxScore_" + sectionId);
+        if(addTestNameInput.value === "" || maxScoreInput.value === "") {
+            alert("Поля должны быть непустыми");
+            return;
+        }
+        const maxScore = Number(maxScoreInput.value);
+        if(isNaN(maxScore) || maxScore <= 0 || !Number.isInteger(maxScore)) {
+            alert("Максимальный балл должен быть натуральным числом");
+            return;
+        }
         const addedTest = {
             sectionId: sectionId,
             name: addTestNameInput.value,
-            maxScore: maxScoreInput.value
+            maxScore: maxScore
         };
         fetch("http://localhost:8080/new-test",
         {
@@ -160,20 +188,20 @@ export class Home extends React.Component {
     if(this.state.role === "TEACHER") {
         return (
             <div>
-                <label htmlFor={"addLecture_" + sectionId}>Add new lecture:</label>
+                <label htmlFor={"addLecture_" + sectionId}>Добавить файл: </label>
                 <input type="file" id={"addLecture_" + sectionId} /><br/>
-                <button onClick={() => this.addLecture(sectionId)}>Submit</button><br/>
+                <button onClick={() => this.addLecture(sectionId)}>Отправить</button><br/>
 
-                <label htmlFor={"addTaskName_" + sectionId}>Add new task:</label>
-                <input id={"addTaskName_" + sectionId} placeholder="task name" />
-                <input id={"addTask_" + sectionId} placeholder="task text" />
-                <input id={"taskMaxScore_" + sectionId} placeholder="max score" /><br/>
-                <button onClick={() => this.addTask(sectionId)}>Submit</button><br/>
+                <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу: </label>
+                <input id={"addTaskName_" + sectionId} placeholder="название" />
+                <input id={"addTask_" + sectionId} placeholder="текст" />
+                <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
+                <button onClick={() => this.addTask(sectionId)}>Отправить</button><br/>
 
-                <label htmlFor={"addTest_" + sectionId}>Add new test:</label>
-                <input id={"addTest_" + sectionId} placeholder="test name" />
-                <input id={"testMaxScore_" + sectionId} placeholder="max score" />
-                <button onClick={() => this.addTest(sectionId)}>Submit</button>
+                <label htmlFor={"addTest_" + sectionId}>Добавить тест: </label>
+                <input id={"addTest_" + sectionId} placeholder="название" />
+                <input id={"testMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
+                <button onClick={() => this.addTest(sectionId)}>Отправить</button>
             </div>
         )
     }
@@ -196,7 +224,7 @@ export class Home extends React.Component {
         return (
             <div>
                 <h1>{section.name}</h1>
-                <div id={"lectures_" + section.id}>{section.name}
+                <div id={"lectures_" + section.id}>
                     {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
                     .map(lecture => (
                         <div>
@@ -244,13 +272,13 @@ export class Home extends React.Component {
     }
 
     return <div>
-                <label htmlFor="addSection">Add new section:</label>
-                <input id="addSection" placeholder="section name"/><br/>
-                <button onClick={this.addSection}>Submit</button><br/>
+                <label htmlFor="addSection">Добавить раздел: </label>
+                <input id="addSection" placeholder="название"/><br/>
+                <button onClick={this.addSection}>Отправить</button><br/>
 
-                <label htmlFor="makeTeacher">Add teacher role to user: </label>
-                <input id="makeTeacher" placeholder="username"/><span> </span>
-                <button onClick={makeTeacher}>Make teacher</button><br/>
+                <label htmlFor="makeTeacher">Сделать пользователя преподавателем: </label>
+                <input id="makeTeacher" placeholder="пользователь"/><br/>
+                <button onClick={makeTeacher}>Отправить</button><br/>
 
                 <div id="sections">{sections}</div>
            </div>

@@ -122,6 +122,8 @@ export class Task extends React.Component {
 
         if(getCookieValue("role") === "TEACHER") {
             return (<div>
+                    <h1>{this.props.task.name}</h1>
+                    <b>Условие:&nbsp;</b>
                     {this.props.task.text}<br/>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
@@ -141,7 +143,7 @@ export class Task extends React.Component {
                                     {submission.checked ? (<div>Оценка: {submission.score}/{this.props.task.maxScore}</div>) : (
                                         <div>
                                             <label htmlFor={"setScoreInput_" + submissionId}>
-                                                Поставить баллы
+                                                Поставить баллы&nbsp;
                                             </label>
                                             <input id={"setScoreInput_" + submissionId}
                                             placeholder={"от 0 до " + this.props.task.maxScore} /><br/>
@@ -157,6 +159,8 @@ export class Task extends React.Component {
         }
 
         return (<div>
+                    <h1>{this.props.task.name}</h1>
+                    <b>Условие:&nbsp;</b>
                     {this.props.task.text}<br/>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
@@ -179,7 +183,7 @@ export class Task extends React.Component {
                         })
                     }
 
-                    <label htmlFor="submitTaskInput">Загрузить файлы</label>
+                    <label htmlFor="submitTaskInput">Загрузить файлы </label>
                     <input type="file" id="submitTaskInput" multiple/><br/>
                     <button onClick={this.submitTask}>Отправить на проверку</button>
                 </div>

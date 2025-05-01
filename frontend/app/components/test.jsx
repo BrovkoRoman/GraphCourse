@@ -230,10 +230,8 @@ export class Test extends React.Component {
         .then(response => response.text())
         .then(result => {
             console.log(result);
-            this.componentDidMount();
+            this.props.toHome();
         });
-
-        this.props.toHome();
     }
 
     getChecked(possibleAnswer) { // returns true if the student chose this answer in their submission

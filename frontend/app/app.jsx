@@ -1,36 +1,35 @@
 import ReactDOM from "react-dom/client"
 import React from "react"
 import {Header} from "./components/header.jsx"
-import {Article} from "./components/article.jsx"
 import {Home} from "./components/home.jsx"
 import {Login} from "./components/login.jsx"
 import {Registration} from "./components/registration.jsx"
 import {Task} from "./components/task.jsx"
 import {Test} from "./components/test.jsx"
+import {Visualization} from "./components/visualization.jsx"
 import {getCookieValue} from "./utils/getCookie.js"
 
 export const baseUrl = "http://localhost:8080/";
-const header = "Рассказ";
-const article = "После одного из заседаний N-ского мирового съезда судьи собрались в совещательной комнате, чтобы снять свои мундиры, минутку отдохнуть и ехать домой обедать.";
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            page: "Home"
+            page: "Visualization"
         }
         this.onClickHome = this.onClickHome.bind(this)
         this.onClickLogin = this.onClickLogin.bind(this)
         this.onClickRegistration = this.onClickRegistration.bind(this)
         this.onClickTask = this.onClickTask.bind(this)
         this.onClickTest = this.onClickTest.bind(this)
+        this.onClickVisualization = this.onClickVisualization.bind(this)
     }
     render() {
         return (<div>
-                   <Header text={header} onClickHome={this.onClickHome}
+                   <Header onClickHome={this.onClickHome}
                                          onClickLogin={this.onClickLogin}
-                                         onClickRegistration={this.onClickRegistration}/>
-                   <Article content={article} />
+                                         onClickRegistration={this.onClickRegistration}
+                                         onClickVisualization={this.onClickVisualization}/>
                    {this.renderContent()}
                </div>)
     }
@@ -46,6 +45,8 @@ class App extends React.Component {
             return <Task task={this.state.task} />
         } else if(this.state.page === "Test") {
             return <Test test={this.state.test} toHome={this.onClickHome}/>
+        } else if(this.state.page === "Visualization") {
+            return <Visualization />
         }
     }
 
@@ -72,6 +73,12 @@ class App extends React.Component {
         this.setState({
             page: "Test",
             test: test
+        })
+    }
+
+    onClickVisualization() {
+        this.setState({
+            page: "Visualization"
         })
     }
 }
