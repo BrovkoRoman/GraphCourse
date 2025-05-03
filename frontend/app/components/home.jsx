@@ -84,6 +84,10 @@ export class Home extends React.Component {
                 mimeType: mimeType,
                 fileContent: arr[1]
             };
+            const addedLectureWithoutContent = {
+                sectionId: sectionId,
+                fileName: file.name
+            };
 
             fetch("http://localhost:8080/new-lecture",
             {
@@ -98,8 +102,10 @@ export class Home extends React.Component {
             .then(result => {
                 console.log(result);
                 this.setState((state) => {
-                    addedLecture.id = result;
-                    state.lectures.push(addedLecture);
+                    addedLectureWithoutContent.id = result;
+                    state.lectures.push(addedLectureWithoutContent);
+                    console.log("state");
+                    console.log(state);
                     return state;
                 });
             })
@@ -195,7 +201,7 @@ export class Home extends React.Component {
                 <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу: </label>
                 <input id={"addTaskName_" + sectionId} placeholder="название" />
                 <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
-                <textarea class="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
+                <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
                 <button onClick={() => this.addTask(sectionId)}>Отправить</button><br/>
 
                 <label htmlFor={"addTest_" + sectionId}>Добавить тест: </label>
@@ -218,6 +224,16 @@ export class Home extends React.Component {
     }
   }
 
+  openFile(file) {
+    fetch("http://localhost:8080/get-file-content?id=" + file.id)
+        .then(response => response.json())
+        .then(lecture => {
+            const a = document.createElement('a');
+            a.href = lecture.mimeType + ";base64," + lecture.fileContent;
+            a.download = file.fileName;
+            a.click();
+        })
+  }
   render() {
     const sections = this.state.sections.map((section) => {
         let taskScoresIndex = 0;
@@ -230,8 +246,7 @@ export class Home extends React.Component {
                     {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
                     .map(lecture => (
                         <div className="content">
-                            <a download={lecture.fileName}
-                               href={lecture.mimeType + ";base64," + lecture.fileContent}>{lecture.fileName}</a>
+                            <a className="blackLink" onClick={() => this.openFile(lecture)}>{lecture.fileName}</a>
                             <br />
                         </div>
                     ))}
@@ -344,7 +359,7 @@ export class Home extends React.Component {
                 })
     }
 
-    fetch("http://localhost:8080/all-lectures")
+    fetch("http://localhost:8080/all-lectures-without-content")
       .then(response => response.json())
       .then(lecturesArray => {
           fetch("http://localhost:8080/all-sections")

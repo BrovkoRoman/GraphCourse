@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -67,7 +69,7 @@ public class TaskController {
     }
     @CrossOrigin
     @GetMapping("/user-task-submission-files")
-    public List<SubmissionFileEntity> getSubmissionFiles(@CookieValue("jwt") String token,
+    public List<SubmissionFileResponseDto> getSubmissionFiles(@CookieValue("jwt") String token,
                                                          @CookieValue("login") String login,
                                                          @CookieValue("role") String role,
                                                          @RequestParam Long taskId,
@@ -78,13 +80,44 @@ public class TaskController {
         }
 
         if(role.equals("TEACHER")) {
-            return submissionFileRepository.findAllByTaskId(taskId);
+            return submissionFileRepository.getTaskSubmissionFilesWithoutFileContent(taskId);
         }
 
         Long id = jwtTokenUtil.getClaimFromToken(token,
                 (claims) -> Long.valueOf(claims.get("id").toString()));
 
-        return submissionFileRepository.getUserTaskSubmissions(id, taskId);
+        return submissionFileRepository.getUserTaskSubmissionFilesWithoutFileContent(id, taskId);
+    }
+    @CrossOrigin
+    @GetMapping("/get-submission-file-content")
+    public Optional<FileContentDto> getFileContent(@CookieValue("jwt") String token,
+                                                   @CookieValue("login") String login,
+                                                   @CookieValue("role") String role,
+                                                   @RequestParam Long submissionFileId,
+                                                   HttpServletResponse response) {
+        if (!jwtTokenUtil.validateToken(token, login, role)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return Optional.empty();
+        }
+
+        Long id = jwtTokenUtil.getClaimFromToken(token,
+                (claims) -> Long.valueOf(claims.get("id").toString()));
+
+        if (!role.equals("TEACHER")) {
+            Optional<Long> studentId = submissionFileRepository.getStudentByFileId(submissionFileId);
+
+            if(studentId.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return Optional.empty();
+            }
+
+            if(!studentId.get().equals(id)) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return Optional.empty();
+            }
+        }
+
+        return submissionFileRepository.getFileContent(submissionFileId);
     }
     @CrossOrigin
     @GetMapping("/task-scores")
@@ -107,14 +140,14 @@ public class TaskController {
     public Long addSubmissionFile(@CookieValue("jwt") String token,
                                   @CookieValue("login") String login,
                                   @CookieValue("role") String role,
-                                  @RequestBody SubmissionFileDto submissionFileDto,
+                                  @RequestBody SubmissionFileRequestDto submissionFileRequestDto,
                                   HttpServletResponse response) {
         if(!jwtTokenUtil.validateToken(token, login, role) || !role.equals("STUDENT")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         }
 
-        SubmissionEntity submission = submissionRepository.findById(submissionFileDto.getSubmissionId()).get();
+        SubmissionEntity submission = submissionRepository.findById(submissionFileRequestDto.getSubmissionId()).get();
         Long submissionAuthorId = submission.getStudentId();
         Long idFromToken = jwtTokenUtil.getClaimFromToken(token,
                 (claims) -> Long.valueOf(claims.get("id").toString()));
@@ -129,7 +162,7 @@ public class TaskController {
             return null;
         }
 
-        return submissionFileRepository.save(new SubmissionFileEntity(submissionFileDto,
+        return submissionFileRepository.save(new SubmissionFileEntity(submissionFileRequestDto,
                 jwtTokenUtil.getClaimFromToken(token,
                         (claims) -> Long.valueOf(claims.get("id").toString())))).getId();
     }

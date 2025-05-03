@@ -375,11 +375,11 @@ export class Visualization extends React.Component {
                         defaultValue={this.getTextFromGraph()}
                         onInput={(e) => this.getGraphFromText(e.target.value)}
                         rows={10} cols={30}/><br/>
-                    <div class="block">
+                    <div className="block">
                         <input type="radio" id="directed" name="1" defaultChecked="checked" onChange={this.setDirected}/>
                         <label htmlFor="directed">Ориентированный</label>
                     </div>
-                    <div class="block">
+                    <div className="block">
                         <input type="radio" id="undirected" name="1" onChange={this.setDirected}/>
                         <label htmlFor="undirected">Неориентированный</label><br/>
                     </div><br/>

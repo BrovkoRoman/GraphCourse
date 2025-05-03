@@ -1,5 +1,7 @@
 package com.example.graphs.controller;
 
+import com.example.graphs.controller.dto.FileContentDto;
+import com.example.graphs.controller.dto.LectureDto;
 import com.example.graphs.jwt.JwtTokenUtil;
 import com.example.graphs.repository.LectureRepository;
 import com.example.graphs.repository.entity.LectureEntity;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -32,8 +35,13 @@ public class LectureController {
     }
 
     @CrossOrigin
-    @GetMapping("/all-lectures")
-    public List<LectureEntity> getLectures() {
-        return lectureRepository.findAll();
+    @GetMapping("/all-lectures-without-content")
+    public List<LectureDto> getLectures() {
+        return lectureRepository.getLecturesWithoutContent();
+    }
+    @CrossOrigin
+    @GetMapping("/get-file-content")
+    public Optional<FileContentDto> getFileContent(@RequestParam Long id) {
+        return lectureRepository.getLectureContent(id);
     }
 }

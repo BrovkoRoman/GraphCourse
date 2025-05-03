@@ -1,6 +1,6 @@
 package com.example.graphs.repository.entity;
 
-import com.example.graphs.controller.dto.SubmissionFileDto;
+import com.example.graphs.controller.dto.SubmissionFileRequestDto;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,7 +20,7 @@ public class SubmissionFileEntity {
     @Column(nullable = false, columnDefinition="BYTEA")
     private byte[] fileContent;
 
-    public SubmissionFileEntity(SubmissionFileDto dto, Long studentId) {
+    public SubmissionFileEntity(SubmissionFileRequestDto dto, Long studentId) {
         taskId = dto.getTaskId();
         fileName = dto.getFileName();
         mimeType = dto.getMimeType();

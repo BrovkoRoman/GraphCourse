@@ -121,6 +121,19 @@ export class Task extends React.Component {
         });
     }
 
+    openFile(file) {
+        fetch("http://localhost:8080/get-submission-file-content?submissionFileId=" + file.id,
+        {
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(fileContentDto => {
+            const a = document.createElement('a');
+            a.href = fileContentDto.mimeType + ";base64," + fileContentDto.fileContent;
+            a.download = file.fileName;
+            a.click();
+        })
+    }
     render() {
         console.log(this.state.submissions);
 
@@ -139,8 +152,9 @@ export class Task extends React.Component {
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
                                         <div className="content">
-                                            <a download={file.fileName}
-                                                href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
+                                            <a className="blackLink" onClick={() => this.openFile(file)}>
+                                                {file.fileName}
+                                            </a>
                                             <br />
                                         </div>
                                     ))}
@@ -163,6 +177,11 @@ export class Task extends React.Component {
             );
         }
 
+        /*
+        <a download={file.fileName}
+                    href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
+        */
+
         return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
                     <h3>Условие:</h3>
@@ -177,8 +196,9 @@ export class Task extends React.Component {
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
                                         <div className="content">
-                                            <a download={file.fileName}
-                                                href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
+                                            <a className="blackLink" onClick={() => this.openFile(file)}>
+                                                {file.fileName}
+                                            </a>
                                             {submission.checked ? null :
                                                 (<a className="blackLink"
                                                 onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>)}
