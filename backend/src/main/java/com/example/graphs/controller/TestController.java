@@ -92,6 +92,13 @@ public class TestController {
             return null;
         }
 
+        Optional<TestEntity> test = testRepository.findById(questionRequestDto.getQuestionEntity().getTestId());
+
+        if(test.isEmpty() || test.get().isPublished()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return (test.isEmpty() ? "Тест не найден" : "Тест уже опубликован");
+        }
+
         Long questionId = testQuestionRepository.save(questionRequestDto.getQuestionEntity()).getId();
 
         for(PossibleAnswerToQuestionEntity answer : questionRequestDto.getPossibleAnswers()) {
@@ -233,7 +240,7 @@ public class TestController {
 
         for(TestQuestionEntity question : questions) {
             if(question.getType() != 3) {
-                break;
+                continue;
             }
 
             Long questionId = question.getId();

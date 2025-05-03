@@ -187,15 +187,15 @@ export class Home extends React.Component {
   createAddButtons(sectionId) {
     if(this.state.role === "TEACHER") {
         return (
-            <div>
+            <div className="addButtons">
                 <label htmlFor={"addLecture_" + sectionId}>Добавить файл: </label>
                 <input type="file" id={"addLecture_" + sectionId} /><br/>
                 <button onClick={() => this.addLecture(sectionId)}>Отправить</button><br/>
 
                 <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу: </label>
                 <input id={"addTaskName_" + sectionId} placeholder="название" />
-                <input id={"addTask_" + sectionId} placeholder="текст" />
                 <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
+                <textarea class="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
                 <button onClick={() => this.addTask(sectionId)}>Отправить</button><br/>
 
                 <label htmlFor={"addTest_" + sectionId}>Добавить тест: </label>
@@ -212,7 +212,7 @@ export class Home extends React.Component {
   buildTestScore(testId, maxScore) {
     const testScoreObject = this.state.testScores.find(obj => (obj.testId === testId));
     if(!!testScoreObject) {
-        return (<span> {testScoreObject.score.toFixed(2)}/{maxScore.toFixed(2)}</span>);
+        return (<span> ({testScoreObject.score.toFixed(2)}/{maxScore.toFixed(2)})</span>);
     } else {
         return null;
     }
@@ -224,24 +224,30 @@ export class Home extends React.Component {
         return (
             <div>
                 <h1>{section.name}</h1>
-                <div id={"lectures_" + section.id}>
+                <div id={"lectures_" + section.id} className="content">
+                    {this.state.lectures.filter(lecture => (lecture.sectionId == section.id)).length === 0 ? null :
+                        (<h3>Файлы</h3>)}
                     {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
                     .map(lecture => (
-                        <div>
+                        <div className="content">
                             <a download={lecture.fileName}
                                href={lecture.mimeType + ";base64," + lecture.fileContent}>{lecture.fileName}</a>
                             <br />
                         </div>
                     ))}
+                    {this.state.tests.filter(test => (test.sectionId == section.id)).length === 0 ? null :
+                        (<h3>Тесты</h3>)}
                     {this.state.tests.filter(test => (test.sectionId == section.id))
                         .map(test => (
-                                <div>
-                                    <a onClick = {() => this.props.onClickTest(test)}>{test.name}
+                                <div className="content">
+                                    <a className="blackLink" onClick = {() => this.props.onClickTest(test)}>{test.name}
                                     {test.published ? null : (<span> (не опубликовано)</span>)}
                                     {this.buildTestScore(test.id, test.maxScore)}</a>
                                 </div>
                             ))
                     }
+                    {this.state.tasks.filter(task => (task.sectionId == section.id)).length === 0 ? null :
+                        (<h3>Задачи</h3>)}
                     {this.state.tasks.filter(task => (task.sectionId == section.id))
                         .map(task => {
                             while(taskScoresIndex < this.state.taskScores.length &&
@@ -249,12 +255,12 @@ export class Home extends React.Component {
                                 taskScoresIndex++;
                             }
                             return (
-                                <div>
-                                    <a onClick = {() => this.props.onClickTask(task)}>{task.name}</a>
+                                <div className="content">
+                                    <a className="blackLink" onClick = {() => this.props.onClickTask(task)}>{task.name}
                                     {taskScoresIndex < this.state.taskScores.length &&
                                      this.state.taskScores[taskScoresIndex].taskId === task.id ?
-                                           (<span> {this.state.taskScores[taskScoresIndex].score}/{task.maxScore}</span>)
-                                           : null}
+                                           (<span> ({this.state.taskScores[taskScoresIndex].score}/{task.maxScore})</span>)
+                                           : null}</a>
                                 </div>
                             );
                         })
@@ -266,12 +272,12 @@ export class Home extends React.Component {
     });
 
     if(this.state.role !== "TEACHER") {
-        return (<div>
+        return (<div className="home">
                     <div id="sections">{sections}</div>
                </div>);
     }
 
-    return <div>
+    return <div className="home">
                 <label htmlFor="addSection">Добавить раздел: </label>
                 <input id="addSection" placeholder="название"/><br/>
                 <button onClick={this.addSection}>Отправить</button><br/>

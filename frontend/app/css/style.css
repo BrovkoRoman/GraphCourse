@@ -1,0 +1,117 @@
+.blackLink:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.curPage {
+    color:blue;
+}
+
+.userInfo {
+    color: blue;
+}
+
+.home {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+
+label {
+    cursor: text;
+}
+
+.header {
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.task {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.test {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.login {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.registration {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.userPage {
+    font-size: 30px;
+    font-family: calibri;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.visualization {
+    font-size: 20px;
+    margin-left: 40px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+
+.hr {
+    color:lightgray;
+    clear:both;
+}
+.right {
+    float: right;
+}
+.half {
+    width: fit-content;
+    display: inline-block;
+}
+button {
+    margin-bottom: 10px;
+}
+.question {
+    margin-bottom: 20px;
+}
+.block {
+    display: inline-block;
+}
+.errorText {
+    color: red;
+    font-size: 14px;
+}
+.home h3 {
+   margin-top: 15px;
+   margin-bottom: 0;
+}
+.task h3 {
+   margin-top: 15px;
+   margin-bottom: 5px;
+}
+.content {
+    margin-left: 15px;
+}
+.addButtons {
+    margin-top: 15px;
+}
+.statement {
+    margin: 10px;
+    width: 200px;
+    height: 100px;
+}
+.display-linebreak {
+  white-space: pre-line;
+}
+.task h2 {
+    margin-bottom: 5px;
+    margin-top: 30px;
+}

@@ -1,16 +1,42 @@
 import React from 'react'
+import {getCookieValue} from "../utils/getCookie.js"
 
 export class Header extends React.Component {
     render() {
-        return (<header>
+        const isLoggedIn = !!getCookieValue("login");
+        return (<header className="header">
                     <h1>
                          <div>
-                             <a onClick={this.props.onClickHome}> Главная </a> &nbsp;
-                             <a onClick={this.props.onClickVisualization}> Визуализация </a> &nbsp;
-                             <a onClick={this.props.onClickLogin}> Войти&nbsp;&nbsp; </a>
-                             <a onClick={this.props.onClickRegistration}> Зарегистрироваться </a> &nbsp;
+                             <div className="half">
+                                 {!isLoggedIn ? null: this.props.curPage === "Home" ?
+                                    (<span className="curPage">&nbsp;Главная&nbsp;&nbsp;</span>) :
+                                 (<a className="blackLink" onClick={this.props.onClickHome}>&nbsp;Главная&nbsp;&nbsp;</a>)}
+                                 {this.props.curPage === "Visualization" ?
+                                 (<span className="curPage">Визуализация&nbsp;</span>) :
+                                 (<a className="blackLink" onClick={this.props.onClickVisualization}>
+                                 Визуализация&nbsp;</a>)}&nbsp;
+                             </div>
+                             <div className="right half">
+                                 {isLoggedIn ? (<a className="blackLink right"
+                                                 onClick={this.props.onClickLogout}>Выйти&nbsp;&nbsp;</a>)
+                                              : null}
+                                 {!isLoggedIn ? null :
+                                     this.props.curPage === "UserPage" ?
+                                         (<span className="curPage right">&nbsp;{getCookieValue("login")}&nbsp;&nbsp;</span>) :
+                                         (<a className="blackLink right"
+                                                  onClick={this.props.onClickUserPage}> {getCookieValue("login")}&nbsp;&nbsp;</a>)}
+                                 {isLoggedIn ? null: this.props.curPage === "Registration" ?
+                                     (<span className="curPage right"> Зарегистрироваться &nbsp;</span>) :
+                                     (<a className="blackLink right"
+                                         onClick={this.props.onClickRegistration}> Зарегистрироваться &nbsp;</a>)}
+                                 {isLoggedIn ? null: this.props.curPage === "Login" ?
+                                                (<span className="curPage right"> Войти &nbsp;</span>) :
+                                 (<a className="blackLink right" onClick={this.props.onClickLogin}> Войти &nbsp;</a>)}
+                            </div>
+
                          </div>
                      </h1>
+                     <hr className="hr"/>
                 </header>);
     }
 }

@@ -84,7 +84,11 @@ export class Task extends React.Component {
     }
 
     setScore(submissionId) {
-        const score = document.getElementById("setScoreInput_" + submissionId).value;
+        const score = Number(document.getElementById("setScoreInput_" + submissionId).value);
+        if(Number.isNaN(score) || !Number.isInteger(score) || score < 0 || score > this.props.task.maxScore) {
+            alert("Баллы должны быть целым числом от 0 до " + this.props.task.maxScore);
+            return;
+        }
         fetch("http://localhost:8080/set-score",
             {
                 headers: {
@@ -121,7 +125,7 @@ export class Task extends React.Component {
         console.log(this.state.submissions);
 
         if(getCookieValue("role") === "TEACHER") {
-            return (<div>
+            return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
                     <b>Условие:&nbsp;</b>
                     {this.props.task.text}<br/>
@@ -134,12 +138,13 @@ export class Task extends React.Component {
                                      </h2>
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
-                                        <div>
+                                        <div className="content">
                                             <a download={file.fileName}
                                                 href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
                                             <br />
                                         </div>
                                     ))}
+                                    <br/>
                                     {submission.checked ? (<div>Оценка: {submission.score}/{this.props.task.maxScore}</div>) : (
                                         <div>
                                             <label htmlFor={"setScoreInput_" + submissionId}>
@@ -158,23 +163,25 @@ export class Task extends React.Component {
             );
         }
 
-        return (<div>
+        return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
-                    <b>Условие:&nbsp;</b>
-                    {this.props.task.text}<br/>
+                    <h3>Условие:</h3>
+                    <div className="content">{this.props.task.text}</div><br/>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
                                <div>
-                                    <h1> Попытка № {submission.tryId}
-                                    {submission.checked ? (<div>{submission.score}/{this.props.task.maxScore}</div>) : null}</h1>
+                                    <h2> Попытка № {submission.tryId}
+                                    {submission.checked ? (<div>{submission.score}/{this.props.task.maxScore}</div>)
+                                                        : null}</h2>
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
-                                        <div>
+                                        <div className="content">
                                             <a download={file.fileName}
                                                 href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
                                             {submission.checked ? null :
-                                                (<a onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>)}
+                                                (<a className="blackLink"
+                                                onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>)}
                                             <br />
                                         </div>
                                     ))}
@@ -182,7 +189,7 @@ export class Task extends React.Component {
                             );
                         })
                     }
-
+                    <br/>
                     <label htmlFor="submitTaskInput">Загрузить файлы </label>
                     <input type="file" id="submitTaskInput" multiple/><br/>
                     <button onClick={this.submitTask}>Отправить на проверку</button>
@@ -199,7 +206,14 @@ export class Task extends React.Component {
         .then(response => response.json())
         .then(submissions => {
             if(!!submissions) {
-                submissions.sort((a, b) => a.tryId > b.tryId ? 1 : -1);
+                submissions.sort((a, b) => {
+                    if(getCookieValue("role") === "TEACHER") {
+                        return a.checked - b.checked;
+                    }
+                    else {
+                        return a.tryId - b.tryId;
+                    }
+                });
 
                 fetch("http://localhost:8080/user-task-submission-files?taskId=" + this.props.task.id,
                 {

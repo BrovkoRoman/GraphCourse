@@ -33,17 +33,15 @@ export class Login extends React.Component {
               document.cookie = "login=" + loginValue;
               document.cookie = "jwt=" + result.jwt;
               document.cookie = "role=" + result.role;
-              alert("Successful login\nCurrent login: "
-              + getCookieValue("login"));
+              this.props.toHome();
             })
             .catch((error) => {
-              alert("Wrong login or password\nCurrent login: "
-              + getCookieValue("login"));
+              alert("Неверное имя пользователя или пароль");
             });
     }
 
     render() {
-        return (<div>
+        return (<div className="login">
                     <input type="text" id="username"
                     name="username" placeholder="Логин" /><br />
 

@@ -13,6 +13,9 @@ export class Registration extends React.Component {
         this.checkPasswordConfirmation =
             this.checkPasswordConfirmation.bind(this);
         this.buttonClick = this.buttonClick.bind(this);
+        this.state = {
+            incorrectLogin: "Некорректный логин"
+        }
     }
     checkDataValidity() {
         const incorrectLogin = document
@@ -39,7 +42,22 @@ export class Registration extends React.Component {
         const loginInput = document.getElementById("username");
         const len = loginInput.value.length;
 
-        if(len < 3 || len > 20) {
+        let F = false;
+
+        for(let x of loginInput.value) {
+            if(!(x >= 'a' && x <= 'z' || x >= 'A' && x <= 'Z' || x >= '0' && x <= '9' || x === "_")) {
+                F = true;
+            }
+        }
+
+        if(F || len < 3 || len > 20) {
+            if(len < 3 || len > 20) {
+                this.setState({incorrectLogin: "Логин должен быть от 3 до 20 символов"});
+            } else if(F) {
+                this.setState({incorrectLogin:
+                        "Логин может содержать только латинские буквы, цифры и знак подчеркивания"});
+            }
+
             incorrectLogin.removeAttribute("hidden");
         } else {
             incorrectLogin.setAttribute("hidden", "");
@@ -76,7 +94,7 @@ export class Registration extends React.Component {
         const loginValue = document
         .getElementById("username").value;
         if(!this.checkDataValidity()) {
-            alert("Data is invalid");
+            alert("Некорректные данные");
             return;
         }
         fetch(baseUrl + 'new-user', {
@@ -100,22 +118,20 @@ export class Registration extends React.Component {
                 document.cookie = "login=" + loginValue;
                 document.cookie = "jwt=" + result.jwt;
                 document.cookie = "role=" + result.role;
-                alert("Successful registration\nCurrent login: "
-                + getCookieValue("login"));
+                this.props.toHome();
               })
               .catch((error) => {
-                alert("This user already exists\nCurrent login: "
-                + getCookieValue("login"));
+                alert("Данное имя пользователя уже занято");
               });
     }
     render() {
-        return (<div>
+        return (<div className="registration">
                     <input type="text" id="username"
                     placeholder="Логин"
                     onChange={this.changeLogin}/><br />
 
                     <div id="incorrectLogin" className="errorText"
-                    hidden>Логин должен быть от 3 до 20 символов</div>
+                    hidden>{this.state.incorrectLogin}</div>
 
                     <input type="password" id="password"
                     onChange={this.changePassword} placeholder="Пароль" />

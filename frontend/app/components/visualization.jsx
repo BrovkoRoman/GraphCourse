@@ -49,6 +49,8 @@ export class Visualization extends React.Component {
         }
 
         this.state = {
+            width: Math.min(600, window.innerWidth - 120), // canvas size
+            height: 400,
             ctx: null, // canvas context
             isDirected: true,
             isWeighted: false,
@@ -78,6 +80,7 @@ export class Visualization extends React.Component {
         this.setDirected = this.setDirected.bind(this);
         this.setWeighted = this.setWeighted.bind(this);
         this.onChangeAlgorithm = this.onChangeAlgorithm.bind(this);
+        this.onResize = this.onResize.bind(this);
     }
     getTextFromGraph() {
         const vertices = this.state.vertices;
@@ -142,8 +145,8 @@ export class Visualization extends React.Component {
                     } else {
                         vertices.push({
                             name: vertexName,
-                            x: getRandomInt(600),
-                            y: getRandomInt(400),
+                            x: getRandomInt(this.state.width - 20) + 10,
+                            y: getRandomInt(this.state.height - 20) + 10,
                             radius: 20,
                             color: "white",
                             borderColor: "black"
@@ -362,8 +365,8 @@ export class Visualization extends React.Component {
         this.onCanvasLoad);
     }
     render() {
-        return (<div>
-                    <canvas id="canvas" width={600} height={400}
+        return (<div className="visualization">
+                    <canvas id="canvas" className="canvas" width={this.state.width} height={this.state.height}
                         style={{"border": "5px solid black"}}
                         onMouseDown={this.onMouseDown}
                         onMouseMove={this.onMouseMove}
@@ -372,10 +375,14 @@ export class Visualization extends React.Component {
                         defaultValue={this.getTextFromGraph()}
                         onInput={(e) => this.getGraphFromText(e.target.value)}
                         rows={10} cols={30}/><br/>
-                    <input type="radio" id="directed" name="1" defaultChecked="checked" onChange={this.setDirected}/>
-                    <label htmlFor="directed">Ориентированный</label>
-                    <input type="radio" id="undirected" name="1" onChange={this.setDirected}/>
-                    <label htmlFor="undirected">Неориентированный</label><br/>
+                    <div class="block">
+                        <input type="radio" id="directed" name="1" defaultChecked="checked" onChange={this.setDirected}/>
+                        <label htmlFor="directed">Ориентированный</label>
+                    </div>
+                    <div class="block">
+                        <input type="radio" id="undirected" name="1" onChange={this.setDirected}/>
+                        <label htmlFor="undirected">Неориентированный</label><br/>
+                    </div><br/>
                     <input type="radio" id="weighted" name="2" onChange={this.setWeighted}/>
                     <label htmlFor="weighted">Взвешенный</label>
                     <input type="radio" id="unweighted" name="2" defaultChecked="checked" onChange={this.setWeighted}/>
@@ -700,8 +707,18 @@ export class Visualization extends React.Component {
             this.drawVertex(vertices[i]);
         }
     }
-
+    onResize() {
+        clearTimeout(this.state.currentTimeout);
+        this.setState({
+            width: Math.min(600, window.innerWidth - 120),
+            height: 400,
+            operationsToDo: ['clear']
+        },
+        this.onCanvasLoad);
+    }
     componentDidMount() {
+        window.addEventListener("resize", this.onResize);
+
         if(this.state.chosenAlgorithm === null) {
             this.onChangeAlgorithm();
         }

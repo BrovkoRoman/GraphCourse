@@ -63,7 +63,9 @@ export class Test extends React.Component {
         })
         .then(response => response.text())
         .then(result => {
-            console.log(result);
+            if(result !== "ok") {
+                alert(result);
+            }
             this.componentDidMount();
         });
     }
@@ -120,8 +122,11 @@ export class Test extends React.Component {
         })
         .then(response => response.text())
         .then(result => {
-            console.log(result);
-            this.componentDidMount();
+            if(result !== "ok") {
+                alert(result);
+            }
+            this.setState({addingPossibleAnswers: []},
+                this.componentDidMount());
         });
     }
 
@@ -281,15 +286,13 @@ export class Test extends React.Component {
     }
 
     render() {
-        console.log(this.state.questions);
-        console.log(this.state.possibleAnswers);
         let questionIndex = 0;
 
         if(getCookieValue("role") === "TEACHER") {
-            return (<div>
+            return (<div className="test">
                         <h1>{this.props.test.name}</h1>
                         {this.state.questions.map(question => (
-                            <div>
+                            <div className="question content">
                                 {++questionIndex}. {question.text}<br/>
                                 {this.state.possibleAnswers.filter(answer => answer.questionId === question.id)
                                     .map(answer => (
@@ -326,11 +329,11 @@ export class Test extends React.Component {
         if(getCookieValue("role") === "STUDENT") {
             if(this.state.submitted) {
                 let isLastInputChecked = false;
-                return (<div>
+                return (<div className="test">
                             <h1>{this.props.test.name} ({this.state.studentAnswers.score.toFixed(2)}
                             /{this.props.test.maxScore.toFixed(2)})</h1>
                             {this.state.questions.map(question => (
-                                <div>
+                                <div className="question content">
                                     {++questionIndex}. {question.text}<br/>
                                     {this.state.possibleAnswers.filter(answer => answer.questionId === question.id)
                                         .map(answer => (
@@ -366,10 +369,10 @@ export class Test extends React.Component {
                         </div>
                 );
             }
-            return (<div>
+            return (<div className="test">
                         <h1>{this.props.test.name}</h1>
                         {this.state.questions.map(question => (
-                            <div>
+                            <div className="question content">
                                 {++questionIndex}. {question.text}<br/>
                                 {this.state.possibleAnswers.filter(answer => answer.questionId === question.id)
                                     .map(answer => (
