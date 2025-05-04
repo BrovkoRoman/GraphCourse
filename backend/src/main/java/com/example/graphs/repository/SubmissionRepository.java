@@ -3,6 +3,7 @@ package com.example.graphs.repository;
 import com.example.graphs.controller.dto.SubmissionResponseDto;
 import com.example.graphs.controller.dto.TaskScoreDto;
 import com.example.graphs.repository.entity.SubmissionEntity;
+import com.example.graphs.service.model.StudentTaskScore;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,8 +32,19 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Lo
     @Query(value = "update task_submissions set checked = true, score = :score where id = :id", nativeQuery = true)
     void setScore(@Param("id") Long id, @Param("score") int score);
 
-    @Query(value = "SELECT task_id, MAX(score) FROM TASK_SUBMISSIONS " +
-            "WHERE student_id = :student_id AND checked GROUP BY task_id",
+    @Query(value = """
+                   SELECT task_id, MAX(score) FROM TASK_SUBMISSIONS
+                   WHERE student_id = :student_id AND checked
+                   GROUP BY task_id
+                   """,
             nativeQuery = true)
     List<TaskScoreDto> getTaskScores(@Param("student_id") Long studentId);
+    @Query(value = """
+                   SELECT LOGIN, task_id, max(score) AS score
+                   FROM TASK_SUBMISSIONS LEFT JOIN USERS
+                   ON TASK_SUBMISSIONS.STUDENT_ID = USERS.ID
+                   WHERE checked AND USERS.ROLE = 'STUDENT'
+                   GROUP BY LOGIN, task_id
+                   """, nativeQuery = true)
+    List<StudentTaskScore> getTaskScoresOfAllStudents();
 }

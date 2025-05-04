@@ -1,5 +1,6 @@
 package com.example.graphs.repository;
 
+import com.example.graphs.controller.dto.StudentScoreDto;
 import com.example.graphs.controller.dto.StudentTestScoresDto;
 import com.example.graphs.repository.entity.StudentTestScoreEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,12 @@ public interface StudentTestScoreRepository extends JpaRepository<StudentTestSco
                    WHERE student_id = :studentId
                    """, nativeQuery = true)
     List<StudentTestScoresDto> getStudentScores(Long studentId);
+    @Query(value = """
+                   SELECT LOGIN, sum(score)
+                   FROM STUDENT_TEST_SCORES LEFT JOIN USERS
+                   ON STUDENT_TEST_SCORES.STUDENT_ID = USERS.ID
+                   WHERE USERS.ROLE = 'STUDENT'
+                   GROUP BY LOGIN
+                   """, nativeQuery = true)
+    List<StudentScoreDto> getTotalScoresOfAllStudents();
 }

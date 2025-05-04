@@ -140,8 +140,8 @@ export class Task extends React.Component {
         if(getCookieValue("role") === "TEACHER") {
             return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
-                    <b>Условие:&nbsp;</b>
-                    {this.props.task.text}<br/>
+                    <h3>Условие:</h3>
+                    <div className="content">{this.props.task.text}</div><br/>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
@@ -176,11 +176,6 @@ export class Task extends React.Component {
                     </div>
             );
         }
-
-        /*
-        <a download={file.fileName}
-                    href={file.mimeType + ";base64," + file.fileContent}>{file.fileName}</a>
-        */
 
         return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>

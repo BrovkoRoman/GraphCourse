@@ -27,5 +27,10 @@ public interface TestRepository extends JpaRepository<TestEntity, Long> {
     @Transactional
     @Query(value = "update tests set published = true where id = :testId", nativeQuery = true)
     void publishTest(Long testId);
+
+    @Query(value = """
+                    SELECT COALESCE(SUM(MAX_SCORE), 0) FROM TESTS
+                    """, nativeQuery = true)
+    double getTotalScore();
 }
 
