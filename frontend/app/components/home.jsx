@@ -152,6 +152,43 @@ export class Home extends React.Component {
         })
     }
 
+    deleteFile(fileId) {
+        fetch("http://localhost:8080/delete-lecture?id=" + fileId,
+        {
+            method: "DELETE",
+            credentials: 'include'
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log(result);
+            this.componentDidMount();
+        });
+    }
+    deleteTask(taskId) {
+        fetch("http://localhost:8080/delete-task?id=" + taskId,
+        {
+            method: "DELETE",
+            credentials: 'include'
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log(result);
+            this.componentDidMount();
+        })
+    }
+    deleteTest(testId) {
+        fetch("http://localhost:8080/delete-test?id=" + testId,
+        {
+            method: "DELETE",
+            credentials: 'include'
+        })
+        .then(response => response.text())
+        .then(result => {
+            console.log(result);
+            this.componentDidMount();
+        })
+    }
+
     addTest(sectionId) {
         console.log("addTest");
         const addTestNameInput = document.getElementById("addTest_" + sectionId);
@@ -198,15 +235,15 @@ export class Home extends React.Component {
                 <input type="file" id={"addLecture_" + sectionId} /><br/>
                 <button onClick={() => this.addLecture(sectionId)}>Отправить</button><br/>
 
-                <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу: </label>
-                <input id={"addTaskName_" + sectionId} placeholder="название" />
-                <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
+                <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу:</label>
+                <input id={"addTaskName_" + sectionId} placeholder="название" className="ml10"/>
+                <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
                 <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
                 <button onClick={() => this.addTask(sectionId)}>Отправить</button><br/>
 
-                <label htmlFor={"addTest_" + sectionId}>Добавить тест: </label>
-                <input id={"addTest_" + sectionId} placeholder="название" />
-                <input id={"testMaxScore_" + sectionId} placeholder="макс. балл" /><br/>
+                <label htmlFor={"addTest_" + sectionId}>Добавить тест:</label>
+                <input id={"addTest_" + sectionId} placeholder="название" className="ml10"/>
+                <input id={"testMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
                 <button onClick={() => this.addTest(sectionId)}>Отправить</button>
             </div>
         )
@@ -247,6 +284,10 @@ export class Home extends React.Component {
                     .map(lecture => (
                         <div className="content">
                             <a className="blackLink" onClick={() => this.openFile(lecture)}>{lecture.fileName}</a>
+                            {this.state.role === "TEACHER" ?
+                                (<a className="blackLink"
+                                    onClick={() => {this.deleteFile(lecture.id)}}> &#10006;</a>) :
+                                null}
                             <br />
                         </div>
                     ))}
@@ -258,7 +299,12 @@ export class Home extends React.Component {
                                     <a className="blackLink" onClick = {() => this.props.onClickTest(test)}>{test.name}
                                     {test.published ? null : (<span> (не опубликовано)</span>)}
                                     {this.buildTestScore(test.id, test.maxScore)}</a>
+                                    {this.state.role === "TEACHER" ?
+                                        (<a className="blackLink"
+                                            onClick={() => {this.deleteTest(test.id)}}> &#10006;</a>) :
+                                        null}
                                 </div>
+
                             ))
                     }
                     {this.state.tasks.filter(task => (task.sectionId == section.id)).length === 0 ? null :
@@ -276,6 +322,10 @@ export class Home extends React.Component {
                                      this.state.taskScores[taskScoresIndex].taskId === task.id ?
                                            (<span> ({this.state.taskScores[taskScoresIndex].score}/{task.maxScore})</span>)
                                            : null}</a>
+                                    {this.state.role === "TEACHER" ?
+                                        (<a className="blackLink"
+                                            onClick={() => {this.deleteTask(task.id)}}> &#10006;</a>) :
+                                        null}
                                 </div>
                             );
                         })
@@ -293,12 +343,12 @@ export class Home extends React.Component {
     }
 
     return <div className="home">
-                <label htmlFor="addSection">Добавить раздел: </label>
-                <input id="addSection" placeholder="название"/><br/>
+                <label htmlFor="addSection">Добавить раздел:</label>
+                <input id="addSection" placeholder="название" className="ml10"/><br/>
                 <button onClick={this.addSection}>Отправить</button><br/>
 
                 <label htmlFor="makeTeacher">Сделать пользователя преподавателем: </label>
-                <input id="makeTeacher" placeholder="пользователь"/><br/>
+                <input id="makeTeacher" placeholder="пользователь" className="ml10"/><br/>
                 <button onClick={makeTeacher}>Отправить</button><br/>
 
                 <div id="sections">{sections}</div>

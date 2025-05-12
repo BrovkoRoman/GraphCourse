@@ -280,7 +280,7 @@ export class Test extends React.Component {
         if(!!correctAnswer && !!studentAnswer && studentAnswer.answer === correctAnswer.text) {
             return (<span style={{color: "green"}}>&#10004;</span>);
         } else {
-            return (<span style={{color: "red"}}>&#10006; Правильный ответ:
+            return (<span style={{color: "red", marginLeft: "10px"}}>&#10006;&nbsp; Правильный ответ:
                 {!!correctAnswer ? " " + correctAnswer.text : null}</span>);
         }
     }
@@ -303,7 +303,7 @@ export class Test extends React.Component {
                                         </div>
                                     )
                                 )}
-                                {question.type == 1 ? <input disabled/> : null}
+                                {question.type == 1 ? <input disabled className="content mt10"/> : null}
                             </div>
                         ))}
 
@@ -358,7 +358,7 @@ export class Test extends React.Component {
                                     )}
                                     {question.type == 1 ?
                                         <span>
-                                            <input disabled
+                                            <input disabled className="content"
                                             value = {this.state.studentAnswers.answers.find(answerDto =>
                                                 (answerDto.questionId === question.id)).answer
                                             }/> {this.getCorrectnessLabelForTextAnswer(question.id)}
@@ -387,7 +387,7 @@ export class Test extends React.Component {
                                     )
                                 )}
                                 {question.type == 1 ?
-                                    <input data-question-id={question.id} className="studentAnswer"/> : null}
+                                    <input data-question-id={question.id} className="studentAnswer content"/> : null}
                             </div>
                         ))}
                         <button onClick={this.submitTest}>Отправить</button>

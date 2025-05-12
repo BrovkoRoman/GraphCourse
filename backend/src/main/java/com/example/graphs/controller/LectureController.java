@@ -44,4 +44,20 @@ public class LectureController {
     public Optional<FileContentDto> getFileContent(@RequestParam Long id) {
         return lectureRepository.getLectureContent(id);
     }
+
+    @CrossOrigin
+    @DeleteMapping("/delete-lecture")
+    public String deleteLecture(@RequestParam Long id,
+                                @CookieValue(value = "jwt") String token,
+                                @CookieValue(value = "login") String login,
+                                @CookieValue(value = "role") String role,
+                                HttpServletResponse response) {
+        if (!jwtTokenUtil.validateToken(token, login, role) || !role.equals("TEACHER")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+
+        lectureRepository.deleteById(id);
+        return "ok";
+    }
 }

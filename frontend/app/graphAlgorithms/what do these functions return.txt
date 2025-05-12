@@ -10,6 +10,7 @@ visit v - makes vertex grey.
 unvisit v - makes vertex white.
 setInfo v info - assigning a value info to additionalInfo parameter of vertex v. It will be displayed above the vertex.
 edge u v color - colors the edge u->v.
+edge u v invisible - makes the edge u->v invisible.
 delay - makes delay before the next operation.
 clear - paints all vertices and edges in default colors. Removes additionalInfo from all vertices.
 

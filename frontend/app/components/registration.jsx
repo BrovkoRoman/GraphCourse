@@ -133,21 +133,21 @@ export class Registration extends React.Component {
                     <div id="incorrectLogin" className="errorText"
                     hidden>{this.state.incorrectLogin}</div>
 
-                    <input type="password" id="password"
+                    <input type="password" id="password" className="mt5"
                     onChange={this.changePassword} placeholder="Пароль" />
                     <br />
 
                     <div id="incorrectPassword" className="errorText"
                     hidden>Пароль должен быть от 8 символов</div>
 
-                    <input type="password" id="confirmPassword"
+                    <input type="password" id="confirmPassword" className="mt5"
                     onChange={this.checkPasswordConfirmation}
                     placeholder="Подтверждение пароля" /><br />
 
                     <div id="incorrectConfirm" className="errorText"
                     hidden>Пароли не совпадают</div>
 
-                    <button type="button" onClick={this.buttonClick}
+                    <button type="button" onClick={this.buttonClick} className="mt10"
                     id="regButton">Зарегистрироваться</button>
                 </div>
         );

@@ -45,10 +45,10 @@ export class Login extends React.Component {
                     <input type="text" id="username"
                     name="username" placeholder="Логин" /><br />
 
-                    <input type="password" id="password" name="password"
+                    <input type="password" id="password" name="password" className="mt5"
                     placeholder="Пароль" /><br />
 
-                    <button type="button" onClick={this.buttonClick}
+                    <button type="button" onClick={this.buttonClick} className="mt10"
                     id="regButton">Войти</button>
                 </div>
         );

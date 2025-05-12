@@ -141,7 +141,7 @@ export class Task extends React.Component {
             return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
                     <h3>Условие:</h3>
-                    <div className="content">{this.props.task.text}</div><br/>
+                    <div className="content">{this.props.task.text}</div>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
@@ -164,7 +164,7 @@ export class Task extends React.Component {
                                             <label htmlFor={"setScoreInput_" + submissionId}>
                                                 Поставить баллы&nbsp;
                                             </label>
-                                            <input id={"setScoreInput_" + submissionId}
+                                            <input id={"setScoreInput_" + submissionId} className="ml10"
                                             placeholder={"от 0 до " + this.props.task.maxScore} /><br/>
                                             <button onClick={() => this.setScore(submissionId)}>Отправить</button>
                                         </div>
@@ -180,13 +180,14 @@ export class Task extends React.Component {
         return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
                     <h3>Условие:</h3>
-                    <div className="content">{this.props.task.text}</div><br/>
+                    <div className="content">{this.props.task.text}</div>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
-                               <div>
+                               <div className={submission.checked ? "mb20" : ""}>
                                     <h2> Попытка № {submission.tryId}
-                                    {submission.checked ? (<div>{submission.score}/{this.props.task.maxScore}</div>)
+                                    {submission.checked ? (<div
+                                        className="content">{submission.score}/{this.props.task.maxScore}</div>)
                                                         : null}</h2>
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
@@ -204,10 +205,11 @@ export class Task extends React.Component {
                             );
                         })
                     }
-                    <br/>
-                    <label htmlFor="submitTaskInput">Загрузить файлы </label>
-                    <input type="file" id="submitTaskInput" multiple/><br/>
-                    <button onClick={this.submitTask}>Отправить на проверку</button>
+                    <div className="mt10">
+                        <label htmlFor="submitTaskInput">Загрузить файлы </label>
+                        <input type="file" id="submitTaskInput" multiple/><br/>
+                        <button onClick={this.submitTask}>Отправить на проверку</button>
+                    </div>
                 </div>
                );
     }

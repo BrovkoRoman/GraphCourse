@@ -42,6 +42,21 @@ public class TaskController {
         }
     }
     @CrossOrigin
+    @DeleteMapping("/delete-task")
+    public String deleteTask(@RequestParam Long id,
+                             @CookieValue(value = "jwt") String token,
+                             @CookieValue(value = "login") String login,
+                             @CookieValue(value = "role") String role,
+                             HttpServletResponse response) {
+        if (!jwtTokenUtil.validateToken(token, login, role) || !role.equals("TEACHER")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+
+        taskRepository.deleteById(id);
+        return "ok";
+    }
+    @CrossOrigin
     @GetMapping("/all-tasks")
     public List<TaskEntity> getTasks() {
         return taskRepository.findAll();

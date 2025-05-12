@@ -371,31 +371,37 @@ export class Visualization extends React.Component {
                         onMouseDown={this.onMouseDown}
                         onMouseMove={this.onMouseMove}
                         onMouseUp={this.onMouseUp}/>
-                    <textarea id="graphDescription"
+                    <textarea id="graphDescription" className="graphDescription"
                         defaultValue={this.getTextFromGraph()}
                         onInput={(e) => this.getGraphFromText(e.target.value)}
-                        rows={10} cols={30}/><br/>
+                        /><br/>
                     <div className="block">
                         <input type="radio" id="directed" name="1" defaultChecked="checked" onChange={this.setDirected}/>
                         <label htmlFor="directed">Ориентированный</label>
                     </div>
+                    &nbsp;&nbsp;
                     <div className="block">
                         <input type="radio" id="undirected" name="1" onChange={this.setDirected}/>
                         <label htmlFor="undirected">Неориентированный</label><br/>
                     </div><br/>
                     <input type="radio" id="weighted" name="2" onChange={this.setWeighted}/>
                     <label htmlFor="weighted">Взвешенный</label>
+                    &nbsp;&nbsp;
                     <input type="radio" id="unweighted" name="2" defaultChecked="checked" onChange={this.setWeighted}/>
                     <label htmlFor="unweighted">Невзвешенный</label><br/>
-                    <label htmlFor="algorithm">Алгоритм: </label>
-                    <select id="algorithm" onChange={this.onChangeAlgorithm}>
-                        <option value="dfs">Обход в глубину (DFS)</option>
-                        <option value="bfs">Обход в ширину (BFS)</option>
-                        <option value="dijkstra">Алгоритм Дейкстры</option>
-                        <option value="fordBellman">Алгоритм Форда-Беллмана</option>
-                        <option value="kruskal">Алгоритм Краскала</option>
-                    </select>
-                    {this.state.chosenAlgorithm}
+                    <div className="mt10 content">
+                        <span>Алгоритм: </span>
+                        <select id="algorithm" onChange={this.onChangeAlgorithm}>
+                            <option value="dfs">Обход в глубину (DFS)</option>
+                            <option value="bfs">Обход в ширину (BFS)</option>
+                            <option value="dijkstra">Алгоритм Дейкстры</option>
+                            <option value="fordBellman">Алгоритм Форда-Беллмана</option>
+                            <option value="kruskal">Алгоритм Краскала</option>
+                        </select>
+                    </div>
+                    <div className="mt10 content">
+                        {this.state.chosenAlgorithm}
+                    </div>
                 </div>);
     }
 

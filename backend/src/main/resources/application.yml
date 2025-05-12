@@ -1,11 +1,11 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         hbm2ddl:
-          auto: create
+          auto: none
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     username: postgres
