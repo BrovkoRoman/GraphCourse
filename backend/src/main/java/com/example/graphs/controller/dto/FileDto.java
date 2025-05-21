@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LectureDto {
+public class FileDto {
     private Long id;
     private Long sectionId;
     private String fileName;

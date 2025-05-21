@@ -6,6 +6,7 @@ import {Login} from "./components/login.jsx"
 import {Registration} from "./components/registration.jsx"
 import {Task} from "./components/task.jsx"
 import {Test} from "./components/test.jsx"
+import {Lecture} from "./components/lecture.jsx"
 import {Visualization} from "./components/visualization.jsx"
 import {UserPage} from "./components/user_page.jsx"
 import {getCookieValue} from "./utils/getCookie.js"
@@ -24,6 +25,7 @@ class App extends React.Component {
         this.onClickRegistration = this.onClickRegistration.bind(this)
         this.onClickTask = this.onClickTask.bind(this)
         this.onClickTest = this.onClickTest.bind(this)
+        this.onClickLecture = this.onClickLecture.bind(this)
         this.onClickVisualization = this.onClickVisualization.bind(this)
         this.onClickLogout = this.onClickLogout.bind(this)
         this.onClickUserPage = this.onClickUserPage.bind(this)
@@ -34,6 +36,7 @@ class App extends React.Component {
                            onClickHome={this.onClickHome}
                            onClickLogin={this.onClickLogin}
                            onClickRegistration={this.onClickRegistration}
+                           onClickLecture={this.onClickLecture}
                            onClickVisualization={this.onClickVisualization}
                            onClickLogout={this.onClickLogout}
                            onClickUserPage={this.onClickUserPage}
@@ -44,11 +47,14 @@ class App extends React.Component {
 
     renderContent() {
         if(this.state.page === "Home") {
-            return <Home onClickTask={this.onClickTask} onClickTest={this.onClickTest}/>
+            return <Home onClickLecture={this.onClickLecture}
+                onClickTask={this.onClickTask} onClickTest={this.onClickTest}/>
         } else if(this.state.page === "Login") {
             return <Login toHome={this.onClickHome}/>
         } else if(this.state.page === "Registration") {
             return <Registration toHome={this.onClickHome}/>
+        } else if(this.state.page === "Lecture") {
+            return <Lecture lecture={this.state.lecture} />
         } else if(this.state.page === "Task") {
             return <Task task={this.state.task} />
         } else if(this.state.page === "Test") {
@@ -89,6 +95,17 @@ class App extends React.Component {
         deleteCookie("login");
         deleteCookie("role");
         this.onClickLogin();
+    }
+
+    onClickLecture(lecture) {
+        this.setState({
+            page: "Lecture",
+            lecture: lecture
+        },
+        this.setStateInLocalStorage({
+            page: "Lecture",
+            lecture: lecture
+        }));
     }
 
     onClickTask(task) {

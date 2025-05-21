@@ -132,9 +132,9 @@ export class Test extends React.Component {
 
     createAddingTextAnswer() {
         return (<div>
-                    <input id="question" placeholder="вопрос"/><br/>
-                    <input id="answer" placeholder="ответ"/><br/>
-                    <button onClick={this.addQuestionWithTextAnswer}>Отправить</button>
+                    <input id="question" placeholder="вопрос" className="mt5"/><br/>
+                    <input id="answer" placeholder="ответ" className="mt5"/><br/>
+                    <button onClick={this.addQuestionWithTextAnswer} className="mt10">Отправить</button>
                 </div>
         );
     }
@@ -150,14 +150,14 @@ export class Test extends React.Component {
     createAddingSingleAnswer() {
         let answerIndex = 0;
         return (<div>
-                    <input id="question" placeholder="текст вопроса"/><br/>
+                    <input id="question" placeholder="текст вопроса" className="mt5"/><br/>
                     {this.state.addingPossibleAnswers.map(answer => (
                         <div>
                             <input type="radio" name="1" id={"answer_" + (++answerIndex)}/>
                             <label htmlFor={"answer_" + answerIndex}>{answer}</label>
                         </div>
                     ))}
-                    <input id="addingPossibleAnswer"
+                    <input id="addingPossibleAnswer" className="mt5"
                     placeholder="вариант ответа"/> <button onClick={this.addPossibleAnswer}>Добавить</button><br/>
                     <button onClick={this.addQuestionWithSingleOrMultipleAnswer}>Отправить</button>
                 </div>
@@ -167,7 +167,7 @@ export class Test extends React.Component {
     createAddingMultipleAnswers() {
         let answerIndex = 0;
         return (<div>
-                    <input id="question" placeholder="текст вопроса"/><br/>
+                    <input id="question" placeholder="текст вопроса" className="mt5"/><br/>
                     {this.state.addingPossibleAnswers.map(answer => (
                         <div>
                             <input type="checkbox" name="1" id={"answer_" + (++answerIndex)}/>
@@ -175,7 +175,7 @@ export class Test extends React.Component {
                         </div>
                     ))}
                     <input id="addingPossibleAnswer"
-                    placeholder="вариант ответа"/> <button onClick={this.addPossibleAnswer}>Добавить</button><br/>
+                    placeholder="вариант ответа" className="mt5"/> <button onClick={this.addPossibleAnswer}>Добавить</button><br/>
                     <button onClick={this.addQuestionWithSingleOrMultipleAnswer}>Отправить</button>
                 </div>
         );
@@ -318,7 +318,7 @@ export class Test extends React.Component {
                                 {this.state.addingQuestionType === "1" ? this.createAddingTextAnswer() :
                                 this.state.addingQuestionType === "2" ? this.createAddingSingleAnswer() :
                                 this.state.addingQuestionType === "3" ? this.createAddingMultipleAnswers() : null}
-                                <button onClick={this.publishTest}>Опубликовать тест</button>
+                                <button onClick={this.publishTest} className="mt10">Опубликовать тест</button>
                             </div>
                         )}
 
