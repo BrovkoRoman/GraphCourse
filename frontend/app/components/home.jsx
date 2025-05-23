@@ -4,27 +4,6 @@ import {Task} from "./task.jsx"
 import {Test} from "./test.jsx"
 import {toBase64} from "../utils/toBase64.js"
 
-function makeTeacher() {
-    const makeTeacherInput = document.getElementById("makeTeacher");
-    if(makeTeacherInput.value === "") {
-        alert("Поле должно быть непустым");
-        return;
-    }
-    fetch("http://localhost:8080/make-teacher",
-    {
-        headers: {
-          'Content-Type': 'plain/text'
-        },
-        method: "PUT",
-        credentials: 'include',
-        body: makeTeacherInput.value
-    })
-    .then(response => response.text())
-    .then(result => {
-        alert(result);
-    })
-}
-
 export class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -277,29 +256,31 @@ export class Home extends React.Component {
     if(this.state.role === "TEACHER") {
         return (
             <div className="addButtons">
-                <label htmlFor={"addLecture_" + sectionId}>Добавить лекцию:</label>
-                <input id={"addLecture_" + sectionId} placeholder="название" className="ml10"/><br/>
-                <button onClick={() => this.addLecture(sectionId)}>Отправить</button><br/>
+                <details>
+                    <summary className="home-add-button">Добавить лекцию</summary>
+                    <input id={"addLecture_" + sectionId} placeholder="название" className="mt10"/>
+                    <button onClick={() => this.addLecture(sectionId)} className="ml20">Отправить</button><br/>
+                </details>
 
-                <label htmlFor={"addFile_" + sectionId}>Добавить файл: </label>
-                <input type="file" id={"addFile_" + sectionId} /><br/>
-                <button onClick={() => this.addFile(sectionId)}>Отправить</button><br/>
+                <details>
+                    <summary className="home-add-button">Добавить задачу</summary>
+                    <input id={"addTaskName_" + sectionId} placeholder="название" className="mt10 ml35"/>
+                    <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
+                    <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
+                    <button onClick={() => this.addTask(sectionId)} className="ml20">Отправить</button><br/>
+                </details>
 
-                <label htmlFor={"addTaskName_" + sectionId}>Добавить задачу:</label>
-                <input id={"addTaskName_" + sectionId} placeholder="название" className="ml10"/>
-                <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
-                <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
-                <button onClick={() => this.addTask(sectionId)}>Отправить</button><br/>
-
-                <label htmlFor={"addTest_" + sectionId}>Добавить тест:</label>
-                <input id={"addTest_" + sectionId} placeholder="название" className="ml10"/>
-                <input id={"testMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
-                <button onClick={() => this.addTest(sectionId)}>Отправить</button>
+                <details>
+                    <summary className="home-add-button">Добавить тест</summary>
+                    <input id={"addTest_" + sectionId} placeholder="название" className="mt10"/>
+                    <input id={"testMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/>
+                    <button onClick={() => this.addTest(sectionId)} className="ml10">Отправить</button>
+                </details>
             </div>
         )
     }
 
-    return null;
+    return (<br/>);
   }
 
   buildTestScore(testId, maxScore) {
@@ -328,75 +309,77 @@ export class Home extends React.Component {
         let taskScoresIndex = 0;
         return (
             <div>
-                <h1>{section.name}</h1>
-                <div id={"files_" + section.id} className="content">
-                    {this.state.lectures.filter(lecture => (lecture.sectionId == section.id)).length === 0 ? null :
-                        (<h3>Лекции</h3>)}
-                    {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
-                    .map(lecture => (
-                        <div className="content">
-                            <a className="blackLink" onClick = {() => this.props.onClickLecture(lecture)}>{lecture.name}</a>
-                            {this.state.role === "TEACHER" ?
-                                (<a className="blackLink"
-                                    onClick={() => {this.deleteLecture(lecture.id)}}> &#10006;</a>) :
-                                null}
-                            <br />
-                        </div>
-                    ))}
-                    {this.state.files.filter(file => (file.sectionId == section.id)).length === 0 ? null :
-                        (<h3>Файлы</h3>)}
-                    {this.state.files.filter(file => (file.sectionId == section.id))
-                    .map(file => (
-                        <div className="content">
-                            <a className="blackLink" onClick={() => this.openFile(file)}>{file.fileName}</a>
-                            {this.state.role === "TEACHER" ?
-                                (<a className="blackLink"
-                                    onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>) :
-                                null}
-                            <br />
-                        </div>
-                    ))}
-                    {this.state.tests.filter(test => (test.sectionId == section.id)).length === 0 ? null :
-                        (<h3>Тесты</h3>)}
-                    {this.state.tests.filter(test => (test.sectionId == section.id))
-                        .map(test => (
-                                <div className="content">
-                                    <a className="blackLink" onClick = {() => this.props.onClickTest(test)}>{test.name}
-                                    {test.published ? null : (<span> (не опубликовано)</span>)}
-                                    {this.buildTestScore(test.id, test.maxScore)}</a>
-                                    {this.state.role === "TEACHER" ?
-                                        (<a className="blackLink"
-                                            onClick={() => {this.deleteTest(test.id)}}> &#10006;</a>) :
-                                        null}
-                                </div>
+                <details>
+                    <summary className="summary">{section.name}</summary>
+                    <div id={"files_" + section.id} className="ml35">
+                        {this.state.lectures.filter(lecture => (lecture.sectionId == section.id)).length === 0 ? null :
+                            (<h3>Лекции</h3>)}
+                        {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
+                        .map(lecture => (
+                            <div className="content">
+                                <a className="blackLink" onClick = {() => this.props.onClickLecture(lecture)}>{lecture.name}</a>
+                                {this.state.role === "TEACHER" ?
+                                    (<a className="blackLink"
+                                        onClick={() => {this.deleteLecture(lecture.id)}}> &#10006;</a>) :
+                                    null}
+                                <br />
+                            </div>
+                        ))}
+                        {this.state.files.filter(file => (file.sectionId == section.id)).length === 0 ? null :
+                            (<h3>Файлы</h3>)}
+                        {this.state.files.filter(file => (file.sectionId == section.id))
+                        .map(file => (
+                            <div className="content">
+                                <a className="blackLink" onClick={() => this.openFile(file)}>{file.fileName}</a>
+                                {this.state.role === "TEACHER" ?
+                                    (<a className="blackLink"
+                                        onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>) :
+                                    null}
+                                <br />
+                            </div>
+                        ))}
+                        {this.state.tests.filter(test => (test.sectionId == section.id)).length === 0 ? null :
+                            (<h3>Тесты</h3>)}
+                        {this.state.tests.filter(test => (test.sectionId == section.id))
+                            .map(test => (
+                                    <div className="content">
+                                        <a className="blackLink" onClick = {() => this.props.onClickTest(test)}>{test.name}
+                                        {test.published ? null : (<span> (не опубликовано)</span>)}
+                                        {this.buildTestScore(test.id, test.maxScore)}</a>
+                                        {this.state.role === "TEACHER" ?
+                                            (<a className="blackLink"
+                                                onClick={() => {this.deleteTest(test.id)}}> &#10006;</a>) :
+                                            null}
+                                    </div>
 
-                            ))
-                    }
-                    {this.state.tasks.filter(task => (task.sectionId == section.id)).length === 0 ? null :
-                        (<h3>Задачи</h3>)}
-                    {this.state.tasks.filter(task => (task.sectionId == section.id))
-                        .map(task => {
-                            while(taskScoresIndex < this.state.taskScores.length &&
-                                this.state.taskScores[taskScoresIndex].taskId < task.id) {
-                                taskScoresIndex++;
-                            }
-                            return (
-                                <div className="content">
-                                    <a className="blackLink" onClick = {() => this.props.onClickTask(task)}>{task.name}
-                                    {taskScoresIndex < this.state.taskScores.length &&
-                                     this.state.taskScores[taskScoresIndex].taskId === task.id ?
-                                           (<span> ({this.state.taskScores[taskScoresIndex].score}/{task.maxScore})</span>)
-                                           : null}</a>
-                                    {this.state.role === "TEACHER" ?
-                                        (<a className="blackLink"
-                                            onClick={() => {this.deleteTask(task.id)}}> &#10006;</a>) :
-                                        null}
-                                </div>
-                            );
-                        })
-                    }
-                    {this.createAddButtons(section.id)}
-                </div>
+                                ))
+                        }
+                        {this.state.tasks.filter(task => (task.sectionId == section.id)).length === 0 ? null :
+                            (<h3>Задачи</h3>)}
+                        {this.state.tasks.filter(task => (task.sectionId == section.id))
+                            .map(task => {
+                                while(taskScoresIndex < this.state.taskScores.length &&
+                                    this.state.taskScores[taskScoresIndex].taskId < task.id) {
+                                    taskScoresIndex++;
+                                }
+                                return (
+                                    <div className="content">
+                                        <a className="blackLink" onClick = {() => this.props.onClickTask(task)}>{task.name}
+                                        {taskScoresIndex < this.state.taskScores.length &&
+                                         this.state.taskScores[taskScoresIndex].taskId === task.id ?
+                                               (<span> ({this.state.taskScores[taskScoresIndex].score}/{task.maxScore})</span>)
+                                               : null}</a>
+                                        {this.state.role === "TEACHER" ?
+                                            (<a className="blackLink"
+                                                onClick={() => {this.deleteTask(task.id)}}> &#10006;</a>) :
+                                            null}
+                                    </div>
+                                );
+                            })
+                        }
+                        {this.createAddButtons(section.id)}
+                    </div>
+                </details>
             </div>
         )
     });
@@ -408,14 +391,11 @@ export class Home extends React.Component {
     }
 
     return <div className="home">
-                <label htmlFor="addSection">Добавить раздел:</label>
-                <input id="addSection" placeholder="название" className="ml10"/><br/>
-                <button onClick={this.addSection}>Отправить</button><br/>
-
-                <label htmlFor="makeTeacher">Сделать пользователя преподавателем: </label>
-                <input id="makeTeacher" placeholder="пользователь" className="ml10"/><br/>
-                <button onClick={makeTeacher}>Отправить</button><br/>
-
+                <details>
+                <summary className="home-advanced-button">Добавить тему</summary>
+                    <input id="addSection" placeholder="название" className="mt10"/>
+                    <button onClick={this.addSection} className="ml20">Отправить</button><br/>
+                </details>
                 <div id="sections">{sections}</div>
            </div>
   }
@@ -493,6 +473,7 @@ export class Home extends React.Component {
                                 .then(response => response.json())
                                 .then(testsArray => {
                                     if(!!testsArray) {
+                                        sectionsArray.sort((a, b) => a.id - b.id);
                                         this.setState({
                                             files: filesArray,
                                             lectures: lecturesArray,
@@ -507,6 +488,7 @@ export class Home extends React.Component {
                                 .then(response => response.json())
                                 .then(testsArray => {
                                     if(!!testsArray) {
+                                        sectionsArray.sort((a, b) => a.id - b.id);
                                         this.setState({
                                             lectures: lecturesArray,
                                             files: filesArray,

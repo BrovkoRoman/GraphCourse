@@ -134,6 +134,26 @@ export class Lecture extends React.Component {
                     {paragraphs.map(text => <p>{this.createBold(text)}</p>)}
                 </div>);
     }
+    createCppCode(content) {
+        const parts = content.split("```");
+
+        let ind = 0;
+
+        return (<div>
+                    {parts.map(text => {
+                        ind += 1;
+                        if(ind % 2 === 1) {
+                            return this.createParagraphs(text);
+                        }
+                        else {
+                            return (<div className="code"><pre><code className="language-cpp">
+                                {text}
+                            </code></pre></div>);
+
+                        }
+                    })}
+                </div>);
+    }
     editTextField(fieldId) {
         for(let i = 0; i < this.state.lectureTextFields.length; i++) {
             if(this.state.lectureTextFields[i].id === fieldId) {
@@ -216,7 +236,7 @@ export class Lecture extends React.Component {
                                     </div>)
                                     : (<div>
                                             {this.insertFieldButtons(curFieldIndex)}
-                                            {this.createParagraphs(field.content)}
+                                            {this.createCppCode(field.content)}
                                             <div className="mt10 ml5p">
                                                 <button onClick={() => this.editTextField(field.id)}>Редактировать</button>
                                                 <button className="ml20" onClick={() => this.deleteTextField(field.id)}>Удалить</button>
@@ -250,7 +270,7 @@ export class Lecture extends React.Component {
                                 textFieldsIndex++;
                                 const field = this.state.lectureTextFields[textFieldsIndex];
                                 return (<div>
-                                            {this.createParagraphs(field.content)}
+                                            {this.createCppCode(field.content)}
                                        </div>);
                             } else {
                                 imageFieldsIndex++;
@@ -285,5 +305,8 @@ export class Lecture extends React.Component {
                 lectureImageFields: result
             });
         });
+    }
+    componentDidUpdate() {
+        window.Prism.highlightAll();
     }
 }

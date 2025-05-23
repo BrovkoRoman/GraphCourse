@@ -9,6 +9,7 @@
 
 .userInfo {
     color: blue;
+    margin-left: 10px;
 }
 
 .home {
@@ -60,6 +61,8 @@ label {
 .userPage {
     font-size: 30px;
     font-family: calibri;
+    color: #6b6d6e;
+    font-weight: bold;
     margin-left: 40px;
     margin-right: 30px;
     margin-bottom: 30px;
@@ -247,4 +250,50 @@ p {
 }
 .ml5p {
     margin-left: 5%;
+}
+.code {
+    font-size: 14px;
+}
+.summary {
+    font-size: 30px;
+    font-weight: bold;
+    font-family: calibri;
+    color: gray;
+    width: fit-content;
+}
+.summary:hover {
+    color: blue;
+    cursor: pointer;
+}
+.home-advanced-button {
+    font-size: 30px;
+    font-weight: bold;
+    font-family: calibri;
+    color: green;
+    list-style: none;
+    width: fit-content;
+}
+.home-advanced-button:hover {
+    color: #02dff7;
+    cursor: pointer;
+}
+.home-advanced-button:-webkit-details-marker {
+    display: none;
+}
+.ml35 {
+    margin-left: 35px;
+}
+.home-add-button {
+    font-weight: bold;
+    font-family: calibri;
+    color: #4ba4d1;
+    width: fit-content;
+    list-style: none;
+}
+.home-add-button:hover {
+    color: blue;
+    cursor: pointer;
+}
+.home-add:-webkit-details-marker {
+    display: none;
 }

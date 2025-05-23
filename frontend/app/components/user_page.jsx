@@ -9,6 +9,26 @@ export class UserPage extends React.Component {
             totalScore: 0 // maximum possible score
         };
     }
+    makeTeacher() {
+        const makeTeacherInput = document.getElementById("makeTeacher");
+        if(makeTeacherInput.value === "") {
+            alert("Поле должно быть непустым");
+            return;
+        }
+        fetch("http://localhost:8080/make-teacher",
+        {
+            headers: {
+              'Content-Type': 'plain/text'
+            },
+            method: "PUT",
+            credentials: 'include',
+            body: makeTeacherInput.value
+        })
+        .then(response => response.text())
+        .then(result => {
+            alert(result);
+        })
+    }
     render() {
         const isLoggedIn = !!getCookieValue("login");
         if(!isLoggedIn) {
@@ -25,6 +45,13 @@ export class UserPage extends React.Component {
                         (<span>Баллы: {this.state.scores.toFixed(2)}/{this.state.totalScore.toFixed(2)}</span>) :
                      getCookieValue("role") === "TEACHER" && !!this.state.scores ?
                         (<div>
+                            <details>
+                                <summary className="home-advanced-button">
+                                    Сделать другого пользователя преподавателем</summary>
+                                <input id="makeTeacher" placeholder="пользователь"/>
+                                <button onClick={this.makeTeacher} className="ml20">Отправить</button><br/>
+                            </details>
+                            <br/>
                             Баллы студентов:<br/>
                             {this.state.scores.map(studentScore => (
                                 <div className="content">{studentScore.login}: {studentScore.score.toFixed(2)}
