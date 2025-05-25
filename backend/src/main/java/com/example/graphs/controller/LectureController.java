@@ -105,23 +105,6 @@ public class LectureController {
         }
     }
     @CrossOrigin
-    @PutMapping("/update-lecture-image-field")
-    public String updateLectureImageField(@RequestParam Long id, @RequestBody FileContentDto fileContentDto,
-                                          @CookieValue(value = "jwt") String token,
-                                          @CookieValue(value = "login") String login,
-                                          @CookieValue(value = "role") String role,
-                                          HttpServletResponse response) {
-        if(jwtTokenUtil.validateToken(token, login, role) && role.equals("TEACHER")) {
-            lectureImageFieldRepository.updateField(id, fileContentDto.getMimeType(),
-                                                        fileContentDto.getFileContent());
-            return "ok";
-        }
-        else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return null;
-        }
-    }
-    @CrossOrigin
     @DeleteMapping("/delete-lecture")
     public String deleteLecture(@RequestParam Long id,
                              @CookieValue(value = "jwt") String token,
