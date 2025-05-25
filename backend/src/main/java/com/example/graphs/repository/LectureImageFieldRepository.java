@@ -19,14 +19,6 @@ public interface LectureImageFieldRepository extends JpaRepository<LectureImageF
     @Modifying
     @Transactional
     @Query(value = """
-                   update lecture_image_fields
-                   set mime_type=:mimeType, content = :content
-                   where id = :id
-                   """, nativeQuery = true)
-    void updateField(@Param("id") Long id, @Param("mimeType") String mimeType, @Param("content") byte[] content);
-    @Modifying
-    @Transactional
-    @Query(value = """
                    update lecture_image_fields set field_index = field_index + 1
                    where lecture_id = :lectureId
                    and field_index >= :insertingFieldIndex
