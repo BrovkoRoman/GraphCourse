@@ -297,3 +297,9 @@ p {
 .home-add:-webkit-details-marker {
     display: none;
 }
+.mt15 {
+    margin-top: 15px;
+}
+.f25 {
+    font-size: 25px;
+}

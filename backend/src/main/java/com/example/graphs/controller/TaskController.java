@@ -2,20 +2,16 @@ package com.example.graphs.controller;
 
 import com.example.graphs.controller.dto.*;
 import com.example.graphs.jwt.JwtTokenUtil;
-import com.example.graphs.repository.SubmissionFileRepository;
-import com.example.graphs.repository.SubmissionRepository;
-import com.example.graphs.repository.TaskRepository;
-import com.example.graphs.repository.entity.SubmissionEntity;
-import com.example.graphs.repository.entity.SubmissionFileEntity;
-import com.example.graphs.repository.entity.TaskEntity;
+import com.example.graphs.repository.*;
+import com.example.graphs.repository.entity.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @RestController
 @AllArgsConstructor
@@ -24,6 +20,12 @@ public class TaskController {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private TaskVariantRepository taskVariantRepository;
+    @Autowired
+    private StudentTaskVariantRepository studentTaskVariantRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private SubmissionFileRepository submissionFileRepository;
     @Autowired
@@ -40,6 +42,64 @@ public class TaskController {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         }
+    }
+    @CrossOrigin
+    @PostMapping("/new-task-variant")
+    public Long addTaskVariant(@RequestBody TaskVariantEntity taskVariant,
+                               @CookieValue(value = "jwt") String token,
+                               @CookieValue(value = "login") String login,
+                               @CookieValue(value = "role") String role, HttpServletResponse response) {
+        if(jwtTokenUtil.validateToken(token, login, role) && role.equals("TEACHER")) {
+            return taskVariantRepository.save(taskVariant).getId();
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+    }
+    @CrossOrigin
+    @GetMapping("/all-task-variants")
+    public List<TaskVariantEntity> allTaskVariants(@RequestParam Long taskId) {
+        return taskVariantRepository.findAllByTaskId(taskId);
+    }
+    @CrossOrigin
+    @GetMapping("/student-task-variant")
+    public TaskVariantDto studentTaskVariant(@RequestParam Long taskId,
+                                                @CookieValue(value = "jwt") String token,
+                                                @CookieValue(value = "login") String login,
+                                                @CookieValue(value = "role") String role,
+                                                HttpServletResponse response) {
+        if (!jwtTokenUtil.validateToken(token, login, role) || !role.equals("STUDENT")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        }
+
+        Optional<UserEntity> user = userRepository.findByLogin(login);
+
+        if(user.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        Optional<Long> variantOptional = studentTaskVariantRepository
+                .getStudentTaskVariant(user.get().getId(), taskId);
+
+        long variantIndex;
+
+        if(variantOptional.isPresent()) {
+            variantIndex = variantOptional.get();
+        }
+        else {
+            Long numberOfVariants = taskVariantRepository.countVariants(taskId);
+            Random rnd = new Random();
+            variantIndex = rnd.nextLong(numberOfVariants);
+            StudentTaskVariantEntity studentTaskVariantEntity =
+                    new StudentTaskVariantEntity(user.get().getId(), taskId, variantIndex);
+            studentTaskVariantRepository.save(studentTaskVariantEntity);
+        }
+
+        String text = taskVariantRepository.getTextByVariantIndex(taskId, variantIndex);
+        return new TaskVariantDto(variantIndex, text);
     }
     @CrossOrigin
     @DeleteMapping("/delete-task")
@@ -198,6 +258,7 @@ public class TaskController {
 
         return submissionRepository.save(new SubmissionEntity(submissionRequestDto.getTaskId(),
                 userId,
+                submissionRequestDto.getVariantIndex(),
                 submissionRequestDto.getTryId())).getId();
     }
     @CrossOrigin

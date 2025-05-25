@@ -5,8 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FileDto {
-    private Long id;
-    private Long sectionId;
-    private String fileName;
+public class TaskVariantDto {
+    public Long variantIndex;
+    public String text;
 }

@@ -12,6 +12,5 @@ public class TaskEntity {
     private Long id;
     private Long sectionId;
     private String name;
-    private String text;
     private int maxScore;
 }

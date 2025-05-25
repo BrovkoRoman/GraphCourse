@@ -9,7 +9,6 @@ export class Home extends React.Component {
         super(props);
         this.addSection = this.addSection.bind(this);
         this.state = {
-            files: [],
             lectures: [],
             sections: [],
             tasks: [],
@@ -49,49 +48,6 @@ export class Home extends React.Component {
         })
     }
 
-    async addFile(sectionId) {
-        console.log("addFile");
-        const addFileInput = document.getElementById("addFile_" + sectionId);
-        console.log(addFileInput.files);
-        for(let i = 0; i < addFileInput.files.length; i++) {
-            const file = addFileInput.files[i];
-            const fileContent = await toBase64(file);
-            const arr = fileContent.split(",");
-            const mimeType = arr[0].split(";")[0];
-            const addedFile = {
-                sectionId: sectionId,
-                fileName: file.name,
-                mimeType: mimeType,
-                fileContent: arr[1]
-            };
-            const addedFileWithoutContent = {
-                sectionId: sectionId,
-                fileName: file.name
-            };
-
-            fetch("http://localhost:8080/new-file",
-            {
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                method: "POST",
-                credentials: 'include',
-                body: JSON.stringify(addedFile)
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                this.setState((state) => {
-                    addedFileWithoutContent.id = result;
-                    state.files.push(addedFileWithoutContent);
-                    console.log("state");
-                    console.log(state);
-                    return state;
-                });
-            })
-        }
-    }
-
     addLecture(sectionId) {
         const addLectureInput = document.getElementById("addLecture_" + sectionId);
 
@@ -125,6 +81,25 @@ export class Home extends React.Component {
         });
     }
 
+    addTaskVariant(taskId, text) {
+        fetch("http://localhost:8080/new-task-variant",
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+                taskId: taskId,
+                variantIndex: 0,
+                text: text
+            })
+        })
+        .then(response => response.text())
+        .then(result => {
+            this.componentDidMount();
+        });
+    }
     addTask(sectionId) {
         console.log("addTask");
         const addTaskNameInput = document.getElementById("addTaskName_" + sectionId);
@@ -142,7 +117,6 @@ export class Home extends React.Component {
         const addedTask = {
             sectionId: sectionId,
             name: addTaskNameInput.value,
-            text: addTaskInput.value,
             maxScore: maxScore
         };
         fetch("http://localhost:8080/new-task",
@@ -156,27 +130,15 @@ export class Home extends React.Component {
         })
         .then(response => response.text())
         .then(result => {
-            console.log(result);
+            this.addTaskVariant(result, addTaskInput.value);
             this.setState((state) => {
                 addedTask.id = result;
                 state.tasks.push(addedTask);
                 return state;
             });
-        })
-    }
-
-    deleteFile(fileId) {
-        fetch("http://localhost:8080/delete-file?id=" + fileId,
-        {
-            method: "DELETE",
-            credentials: 'include'
-        })
-        .then(response => response.text())
-        .then(result => {
-            console.log(result);
-            this.componentDidMount();
         });
     }
+
     deleteLecture(lectureId) {
         fetch("http://localhost:8080/delete-lecture?id=" + lectureId,
         {
@@ -266,7 +228,7 @@ export class Home extends React.Component {
                     <summary className="home-add-button">Добавить задачу</summary>
                     <input id={"addTaskName_" + sectionId} placeholder="название" className="mt10 ml35"/>
                     <input id={"taskMaxScore_" + sectionId} placeholder="макс. балл" className="ml10"/><br/>
-                    <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие" /><br/>
+                    <textarea className="statement" id={"addTask_" + sectionId} placeholder="условие 1 варианта" /><br/>
                     <button onClick={() => this.addTask(sectionId)} className="ml20">Отправить</button><br/>
                 </details>
 
@@ -291,27 +253,14 @@ export class Home extends React.Component {
         return null;
     }
   }
-
-  openFile(file) {
-    fetch("http://localhost:8080/get-file-content?id=" + file.id)
-        .then(response => response.json())
-        .then(fileContentDto => {
-            console.log("name", file.fileName);
-            const a = document.createElement('a');
-            a.href = fileContentDto.mimeType + ";base64," + fileContentDto.fileContent;
-            a.download = file.fileName;
-            a.click();
-        })
-  }
   render() {
-    console.log(this.state.files);
     const sections = this.state.sections.map((section) => {
         let taskScoresIndex = 0;
         return (
             <div>
                 <details>
                     <summary className="summary">{section.name}</summary>
-                    <div id={"files_" + section.id} className="ml35">
+                    <div className="ml35">
                         {this.state.lectures.filter(lecture => (lecture.sectionId == section.id)).length === 0 ? null :
                             (<h3>Лекции</h3>)}
                         {this.state.lectures.filter(lecture => (lecture.sectionId == section.id))
@@ -321,19 +270,6 @@ export class Home extends React.Component {
                                 {this.state.role === "TEACHER" ?
                                     (<a className="blackLink"
                                         onClick={() => {this.deleteLecture(lecture.id)}}> &#10006;</a>) :
-                                    null}
-                                <br />
-                            </div>
-                        ))}
-                        {this.state.files.filter(file => (file.sectionId == section.id)).length === 0 ? null :
-                            (<h3>Файлы</h3>)}
-                        {this.state.files.filter(file => (file.sectionId == section.id))
-                        .map(file => (
-                            <div className="content">
-                                <a className="blackLink" onClick={() => this.openFile(file)}>{file.fileName}</a>
-                                {this.state.role === "TEACHER" ?
-                                    (<a className="blackLink"
-                                        onClick={() => {this.deleteFile(file.id)}}> &#10006;</a>) :
                                     null}
                                 <br />
                             </div>
@@ -457,52 +393,46 @@ export class Home extends React.Component {
     fetch("http://localhost:8080/all-lectures")
       .then(response => response.json())
       .then(lecturesArray => {
-        fetch("http://localhost:8080/all-files-without-content")
-          .then(response => response.json())
-          .then(filesArray => {
-              fetch("http://localhost:8080/all-sections")
-                  .then(response => response.json())
-                  .then(sectionsArray => {
-                      fetch("http://localhost:8080/all-tasks")
-                        .then(response => response.json())
-                        .then(tasksArray => {
-                            if(getCookieValue("role") === "TEACHER") {
-                                fetch("http://localhost:8080/all-tests", {
-                                    credentials : 'include'
-                                })
-                                .then(response => response.json())
-                                .then(testsArray => {
-                                    if(!!testsArray) {
-                                        sectionsArray.sort((a, b) => a.id - b.id);
-                                        this.setState({
-                                            files: filesArray,
-                                            lectures: lecturesArray,
-                                            sections: sectionsArray,
-                                            tasks: tasksArray,
-                                            tests: testsArray
-                                        });
-                                    }
-                                });
-                            } else if(getCookieValue("role") === "STUDENT") {
-                                fetch("http://localhost:8080/all-published-tests")
-                                .then(response => response.json())
-                                .then(testsArray => {
-                                    if(!!testsArray) {
-                                        sectionsArray.sort((a, b) => a.id - b.id);
-                                        this.setState({
-                                            lectures: lecturesArray,
-                                            files: filesArray,
-                                            sections: sectionsArray,
-                                            tasks: tasksArray,
-                                            tests: testsArray
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                  });
-          });
-    });
+          fetch("http://localhost:8080/all-sections")
+              .then(response => response.json())
+              .then(sectionsArray => {
+                  fetch("http://localhost:8080/all-tasks")
+                    .then(response => response.json())
+                    .then(tasksArray => {
+                        if(getCookieValue("role") === "TEACHER") {
+                            fetch("http://localhost:8080/all-tests", {
+                                credentials : 'include'
+                            })
+                            .then(response => response.json())
+                            .then(testsArray => {
+                                if(!!testsArray) {
+                                    sectionsArray.sort((a, b) => a.id - b.id);
+                                    this.setState({
+                                        lectures: lecturesArray,
+                                        sections: sectionsArray,
+                                        tasks: tasksArray,
+                                        tests: testsArray
+                                    });
+                                }
+                            });
+                        } else if(getCookieValue("role") === "STUDENT") {
+                            fetch("http://localhost:8080/all-published-tests")
+                            .then(response => response.json())
+                            .then(testsArray => {
+                                if(!!testsArray) {
+                                    sectionsArray.sort((a, b) => a.id - b.id);
+                                    this.setState({
+                                        lectures: lecturesArray,
+                                        sections: sectionsArray,
+                                        tasks: tasksArray,
+                                        tests: testsArray
+                                    });
+                                }
+                            });
+                        }
+                    });
+              });
+      });
 
 
 

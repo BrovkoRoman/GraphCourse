@@ -6,9 +6,11 @@ export class Task extends React.Component {
     constructor(props) {
         super(props);
         this.submitTask = this.submitTask.bind(this);
+        this.addVariant = this.addVariant.bind(this);
         this.state = {
             submissionFiles: [],
-            submissions: []
+            submissions: [],
+            variants: []
         };
     }
 
@@ -30,6 +32,7 @@ export class Task extends React.Component {
                     credentials: 'include',
                     body: JSON.stringify({
                         taskId: this.props.task.id,
+                        variantIndex: this.state.variants[0].variantIndex,
                         tryId: this.state.submissions.length + 1
                     })
                 }
@@ -134,21 +137,60 @@ export class Task extends React.Component {
             a.click();
         })
     }
+    addVariant() {
+        const text = document.getElementById("addVariant").value;
+
+        if(text.length == 0) {
+            alert("Поле должно быть непустым");
+            return;
+        }
+
+        fetch("http://localhost:8080/new-task-variant",
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            credentials: 'include',
+            body: JSON.stringify({
+                taskId: this.props.task.id,
+                variantIndex: this.state.variants.length,
+                text: document.getElementById("addVariant").value
+            })
+        })
+        .then(response => response.json())
+        .then(result => this.componentDidMount());
+    }
     render() {
         console.log(this.state.submissions);
 
         if(getCookieValue("role") === "TEACHER") {
             return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
-                    <h3>Условие:</h3>
-                    <div className="content">{this.props.task.text}</div>
+                    <div>
+                        {this.state.variants.map(variant => {
+                            return (<div>
+                                        <h3>{"Вариант " + (variant.variantIndex + 1)}</h3>
+                                        {variant.text}
+                                    </div>);
+                        })}
+                        <details>
+                            <summary className="home-add-button mt15 f25">Добавить вариант</summary>
+                            <textarea id="addVariant" placeholder="название"
+                                className="statement" placeholder="условие"/><br/>
+                            <button onClick={this.addVariant} className="ml20">Отправить</button><br/>
+                        </details>
+                    </div>
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
                                <div>
                                     <h2>
                                         Попытка № {submission.tryId} от {submission.login}
-                                     </h2>
+                                    </h2>
+                                    <h3>
+                                        Вариант {submission.variantIndex + 1}
+                                    </h3>
                                     {this.state.submissionFiles.filter(file => file.submissionId == submissionId)
                                     .map(file => (
                                         <div className="content">
@@ -179,8 +221,12 @@ export class Task extends React.Component {
 
         return (<div className="task display-linebreak">
                     <h1>{this.props.task.name}</h1>
-                    <h3>Условие:</h3>
-                    <div className="content">{this.props.task.text}</div>
+                    {this.state.variants.map(variant => {
+                        return (<div>
+                                    <h3>{"Вариант " + (variant.variantIndex + 1)}</h3>
+                                    {variant.text}
+                                </div>);
+                    })}
                     {this.state.submissions.map(submission => {
                             let submissionId = submission.id;
                             return (
@@ -215,6 +261,25 @@ export class Task extends React.Component {
     }
 
     componentDidMount() {
+        if(getCookieValue("role") === "TEACHER") {
+            fetch("http://localhost:8080/all-task-variants?taskId=" + this.props.task.id)
+            .then(response => response.json())
+            .then(result => {
+                result.sort((a, b) => a.variantIndex - b.variantIndex);
+                this.setState({variants: result});
+            });
+        }
+        else {
+            fetch("http://localhost:8080/student-task-variant?taskId=" + this.props.task.id,
+            {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(result => {
+                this.setState({variants: [result]});
+            });
+        }
+
         fetch("http://localhost:8080/user-task-submissions?taskId=" + this.props.task.id,
         {
             method: "GET",

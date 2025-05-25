@@ -15,12 +15,15 @@ import java.util.List;
 
 @Repository
 public interface SubmissionRepository extends JpaRepository<SubmissionEntity, Long> {
-    @Query(value = "SELECT id, checked, score, try_id FROM TASK_SUBMISSIONS WHERE STUDENT_ID = :student_id" +
-            " AND TASK_ID = :task_id", nativeQuery = true)
+    @Query(value = """
+                   SELECT id, checked, score, try_id, variant_index
+                   FROM TASK_SUBMISSIONS WHERE STUDENT_ID = :student_id
+                   AND TASK_ID = :task_id
+                   """, nativeQuery = true)
     List<SubmissionResponseDto> getUserTaskSubmissions(@Param("student_id") Long studentId, @Param("task_id") Long taskId);
 
     @Query(value = """
-                    SELECT s.id, s.checked, s.score, s.try_id, u.login
+                    SELECT s.id, s.checked, s.score, s.try_id, s.variant_index, u.login
                     FROM TASK_SUBMISSIONS AS s INNER JOIN USERS AS u
                     ON s.student_id = u.id
                     WHERE TASK_ID = :task_id

@@ -13,12 +13,14 @@ public class SubmissionEntity {
     private int tryId;
     private Long taskId;
     private Long studentId;
+    private Long variantIndex;
     private boolean checked;
     private int score;
 
-    public SubmissionEntity(Long taskId, Long studentId, int tryId) {
+    public SubmissionEntity(Long taskId, Long studentId, Long variantIndex, int tryId) {
         this.tryId = tryId;
         this.taskId = taskId;
+        this.variantIndex = variantIndex;
         this.studentId = studentId;
         checked = false;
         score = 0;
